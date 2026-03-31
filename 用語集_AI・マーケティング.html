@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>横文字ハンター</title>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c28;
+  --border: #2a2a3d;
+  --accent: #7c6ff7;
+  --accent2: #f7c948;
+  --green: #30d158;
+  --red: #ff453a;
+  --text: #f0f0f5;
+  --muted: #8888aa;
+  --s-rank: #ffd700;
+  --a-rank: #ff9f43;
+  --b-rank: #54a0ff;
+  --c-rank: #a29bfe;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+/* ── NAV ── */
+nav {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px; height: 56px;
+  position: sticky; top: 0; z-index: 200; gap: 4px;
+}
+.nav-logo { font-weight: 800; font-size: 1rem; letter-spacing: 0.04em; color: var(--accent); margin-right: auto; }
+.nav-logo span { color: var(--accent2); }
+.nav-btn {
+  padding: 7px 14px; border-radius: 8px; border: none; background: transparent;
+  color: var(--muted); font-size: 0.82rem; cursor: pointer; transition: all 0.18s;
+}
+.nav-btn:hover, .nav-btn.active { background: var(--surface2); color: var(--text); }
+.nav-btn.active { color: var(--accent); }
+.xp-bar-wrap { display: flex; align-items: center; gap: 8px; margin-left: 12px; }
+.level-badge { background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 800; padding: 3px 8px; border-radius: 12px; white-space: nowrap; }
+.xp-track { width: 80px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width 0.6s ease; }
+
+/* ── SCREENS ── */
+.screen { display: none; padding: 24px 20px 60px; max-width: 700px; margin: 0 auto; }
+.screen.active { display: block; }
+
+/* ── HOME ── */
+.home-hero {
+  background: linear-gradient(135deg, var(--surface2) 0%, #1a1a2e 100%);
+  border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px; margin-bottom: 20px; text-align: center;
+}
+.home-hero h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+.home-hero p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+.big-stat { font-size: 2.8rem; font-weight: 900; color: var(--accent2); line-height: 1; margin: 12px 0 4px; }
+.stat-label { font-size: 0.75rem; color: var(--muted); }
+.home-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px; text-align: center; }
+.stat-card .n { font-size: 2rem; font-weight: 800; color: var(--accent); }
+.stat-card .l { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+.btn-primary {
+  display: block; width: 100%; padding: 15px; border-radius: 14px; border: none;
+  background: linear-gradient(135deg, var(--accent), #9c6ff7); color: #fff;
+  font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity 0.18s; margin-bottom: 12px;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary {
+  display: block; width: 100%; padding: 13px; border-radius: 14px; border: 1.5px solid var(--border);
+  background: transparent; color: var(--text); font-size: 0.92rem; font-weight: 600; cursor: pointer;
+  transition: border-color 0.18s; margin-bottom: 12px;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.recent-section h3 { font-size: 0.85rem; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
+.recent-list { display: flex; flex-direction: column; gap: 8px; }
+.recent-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+  transition: border-color 0.18s;
+}
+.recent-card:hover { border-color: var(--accent); }
+.stars { color: var(--accent2); font-size: 0.8rem; }
+.rc-name { font-weight: 700; font-size: 0.9rem; flex: 1; }
+.rc-cat { font-size: 0.72rem; color: var(--muted); }
+
+/* ── DISCOVER ── */
+.discover-input-wrap { position: relative; margin-bottom: 20px; }
+.discover-input {
+  width: 100%; padding: 16px 20px; font-size: 1.2rem; font-weight: 700;
+  background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
+  color: var(--text); outline: none; transition: border-color 0.2s;
+  letter-spacing: 0.04em;
+}
+.discover-input:focus { border-color: var(--accent); }
+.discover-input::placeholder { color: var(--muted); font-weight: 400; font-size: 1rem; }
+.discover-hint { font-size: 0.8rem; color: var(--muted); text-align: center; margin-bottom: 16px; }
+
+/* ── REVEAL CARD ── */
+.reveal-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+  overflow: hidden; display: none;
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.reveal-header {
+  padding: 22px 22px 16px;
+  background: linear-gradient(135deg, var(--surface2) 0%, #1e1e30 100%);
+  border-bottom: 1px solid var(--border);
+}
+.reveal-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.reveal-term { font-size: 1.8rem; font-weight: 900; letter-spacing: 0.02em; }
+.reveal-reading { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+.reveal-fullname { font-size: 0.82rem; color: var(--accent); margin-top: 4px; }
+.rank-badge {
+  width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 900; flex-shrink: 0;
+}
+.rank-S { background: linear-gradient(135deg, #ffd700, #ff9f00); color: #000; box-shadow: 0 4px 20px rgba(255,215,0,0.4); }
+.rank-A { background: linear-gradient(135deg, #ff9f43, #ee5a24); color: #fff; }
+.rank-B { background: linear-gradient(135deg, #54a0ff, #2980b9); color: #fff; }
+.rank-C { background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: #fff; }
+
+.meta-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.meta-tag {
+  display: flex; align-items: center; gap: 5px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 0.75rem;
+}
+.meta-tag .icon { font-size: 0.85rem; }
+.meta-tag .label { color: var(--muted); }
+.meta-tag .val { font-weight: 700; color: var(--text); }
+
+.impact-wrap { margin-top: 12px; }
+.impact-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 5px; }
+.impact-bar-bg { background: var(--bg); border-radius: 6px; height: 10px; overflow: hidden; }
+.impact-bar { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 1s cubic-bezier(0.34,1.2,0.64,1); width: 0; }
+.impact-score { font-size: 0.8rem; font-weight: 700; color: var(--accent2); margin-top: 4px; text-align: right; }
+
+.reveal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+.reveal-section-title { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.reveal-explanation { font-size: 0.95rem; line-height: 1.7; color: var(--text); }
+.reveal-example {
+  background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0;
+  padding: 10px 14px; font-size: 0.88rem; line-height: 1.6; color: #ccc; font-style: italic;
+}
+.value-box {
+  background: linear-gradient(135deg, #1a1a2e, #16213e); border: 1px solid #2a2a5a;
+  border-radius: 12px; padding: 14px 16px;
+}
+.value-box .vt { font-size: 0.72rem; color: #a29bfe; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.value-box .vm { font-size: 0.88rem; color: #d0d0ff; line-height: 1.6; }
+
+.xp-gain {
+  text-align: center; padding: 14px; background: var(--surface2); border-radius: 12px;
+  animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn { from { opacity:0; transform:scale(0.7); } to { opacity:1; transform:scale(1); } }
+.xp-gain .xg { font-size: 1.6rem; font-weight: 900; color: var(--accent2); }
+.xp-gain .xl { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+
+.btn-save {
+  width: 100%; padding: 14px; border-radius: 14px; border: none;
+  background: linear-gradient(135deg, var(--green), #00c17a); color: #000;
+  font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: opacity 0.18s;
+}
+.btn-save:hover { opacity: 0.85; }
+.btn-saved { background: var(--surface2); color: var(--muted); cursor: default; }
+
+/* manual form */
+.manual-form { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: none; flex-direction: column; gap: 12px; }
+.manual-form.show { display: flex; }
+.form-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 10px 14px; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 10px; color: var(--text); font-size: 0.9rem; outline: none; transition: border-color 0.2s; font-family: inherit;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+.form-textarea { min-height: 80px; resize: vertical; }
+.form-row { display: flex; gap: 10px; }
+.form-row > div { flex: 1; }
+.form-select option { background: var(--surface); }
+
+/* ── LIBRARY ── */
+.lib-controls { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.lib-search {
+  flex: 1; min-width: 140px; padding: 9px 14px; background: var(--surface);
+  border: 1.5px solid var(--border); border-radius: 10px; color: var(--text);
+  font-size: 0.88rem; outline: none;
+}
+.lib-search:focus { border-color: var(--accent); }
+.sort-toggle {
+  padding: 8px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--muted); font-size: 0.78rem; cursor: pointer;
+  transition: all 0.18s; white-space: nowrap;
+}
+.sort-toggle.active { border-color: var(--accent); color: var(--accent); }
+.index-bar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px; }
+.idx-btn { padding: 3px 9px; font-size: 0.75rem; color: var(--accent); cursor: pointer; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); transition: background 0.15s; }
+.idx-btn:hover { background: var(--surface2); }
+.lib-group-header { font-size: 1rem; font-weight: 800; color: var(--muted); padding: 12px 0 6px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.lib-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.lib-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px 16px; cursor: pointer; transition: border-color 0.18s;
+}
+.lib-card:hover { border-color: var(--accent); }
+.lib-card-top { display: flex; align-items: center; gap: 10px; }
+.lib-card-name { font-weight: 700; font-size: 0.95rem; flex: 1; }
+.lib-card-reading { font-size: 0.75rem; color: var(--muted); }
+.lib-card-desc { font-size: 0.83rem; color: #aaa; margin-top: 6px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lib-card-meta { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.mini-tag { font-size: 0.68rem; padding: 2px 8px; border-radius: 10px; background: var(--surface2); color: var(--muted); }
+.mini-rank-S { background: rgba(255,215,0,0.15); color: #ffd700; }
+.mini-rank-A { background: rgba(255,159,67,0.15); color: #ff9f43; }
+.mini-rank-B { background: rgba(84,160,255,0.15); color: #54a0ff; }
+.mini-rank-C { background: rgba(162,155,254,0.15); color: #a29bfe; }
+
+/* ── QUIZ ── */
+.quiz-wrap { display: flex; flex-direction: column; gap: 16px; }
+.quiz-header { text-align: center; }
+.quiz-progress-text { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+.quiz-progress-bar { background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 16px; }
+.quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; transition: width 0.4s; }
+.quiz-question {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px;
+}
+.quiz-q-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.quiz-term { font-size: 1.6rem; font-weight: 900; color: var(--accent2); margin-bottom: 4px; }
+.quiz-hint { font-size: 0.8rem; color: var(--muted); }
+.quiz-choices { display: flex; flex-direction: column; gap: 10px; }
+.quiz-choice {
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 14px 18px; cursor: pointer; transition: all 0.18s; font-size: 0.9rem; line-height: 1.5; text-align: left;
+}
+.quiz-choice:hover:not(:disabled) { border-color: var(--accent); background: var(--surface2); }
+.quiz-choice.correct { border-color: var(--green); background: rgba(48,209,88,0.1); color: #fff; }
+.quiz-choice.wrong { border-color: var(--red); background: rgba(255,69,58,0.1); color: var(--muted); }
+.quiz-choice:disabled { cursor: default; }
+.quiz-feedback {
+  text-align: center; padding: 16px; background: var(--surface2); border-radius: 12px;
+  font-size: 0.95rem; line-height: 1.6; display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-next {
+  width: 100%; padding: 13px; border-radius: 12px; border: none;
+  background: var(--accent); color: #fff; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; display: none;
+}
+.quiz-next.show { display: block; }
+.quiz-result {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+  padding: 30px 24px; text-align: center; display: none;
+}
+.quiz-result.show { display: block; }
+.result-score { font-size: 3rem; font-weight: 900; color: var(--accent2); }
+.result-msg { color: var(--muted); margin-top: 8px; font-size: 0.9rem; }
+.quiz-empty { text-align: center; padding: 40px; color: var(--muted); }
+
+/* ── LEVELUP OVERLAY ── */
+.levelup-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex;
+  align-items: center; justify-content: center; z-index: 999; display: none;
+}
+.levelup-overlay.show { display: flex; }
+.levelup-box {
+  background: var(--surface); border: 2px solid var(--accent2); border-radius: 24px;
+  padding: 40px 36px; text-align: center; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  max-width: 320px; width: 90%;
+}
+.levelup-emoji { font-size: 3rem; margin-bottom: 10px; }
+.levelup-text { font-size: 1.6rem; font-weight: 900; color: var(--accent2); }
+.levelup-sub { color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
+.levelup-close {
+  margin-top: 20px; padding: 11px 28px; background: var(--accent2); color: #000;
+  border: none; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.95rem;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state { text-align: center; padding: 50px 20px; color: var(--muted); }
+.empty-state .ei { font-size: 3rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.9rem; line-height: 1.6; }
+
+@media(max-width:500px) { .form-row { flex-direction: column; } .home-stats { grid-template-columns: repeat(3,1fr); gap: 8px; } .stat-card .n { font-size: 1.5rem; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">横文字<span>ハンター</span></div>
+  <button class="nav-btn active" data-screen="home">ホーム</button>
+  <button class="nav-btn" data-screen="discover">発見</button>
+  <button class="nav-btn" data-screen="library">図鑑</button>
+  <button class="nav-btn" data-screen="quiz">復習</button>
+  <div class="xp-bar-wrap">
+    <div class="level-badge" id="navLevel">Lv.1</div>
+    <div class="xp-track"><div class="xp-fill" id="navXpFill" style="width:0%"></div></div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="home-hero">
+    <div style="font-size:2rem;margin-bottom:8px;">🎯</div>
+    <h2>横文字ハンター</h2>
+    <p>知らない横文字に出会ったら、すぐここへ。<br>登録するたびに自分が強くなる。</p>
+    <div class="big-stat" id="homeXp">0</div>
+    <div class="stat-label">Total XP</div>
+  </div>
+  <div class="home-stats">
+    <div class="stat-card"><div class="n" id="homeTotalTerms">0</div><div class="l">登録語数</div></div>
+    <div class="stat-card"><div class="n" id="homeMastered">0</div><div class="l">マスター済</div></div>
+    <div class="stat-card"><div class="n" id="homeStreak">0</div><div class="l">日連続</div></div>
+  </div>
+  <button class="btn-primary" onclick="goScreen('discover')">＋ 横文字を登録する</button>
+  <button class="btn-secondary" onclick="startQuiz()">🧠 クイズで復習する</button>
+  <div class="recent-section">
+    <h3>最近登録した用語</h3>
+    <div class="recent-list" id="recentList"><div class="empty-state"><div class="ei">📭</div><p>まだ用語がありません<br>横文字に出会ったら登録してみよう！</p></div></div>
+  </div>
+</div>
+
+<!-- DISCOVER -->
+<div class="screen" id="screen-discover">
+  <div class="discover-input-wrap">
+    <input type="text" class="discover-input" id="discoverInput" placeholder="横文字を入力... 例: LLM, KPI, RAG" autocomplete="off" autocapitalize="characters">
+  </div>
+  <p class="discover-hint">入力 → Enter で検索。知らない単語に出会ったら即登録！</p>
+
+  <div class="reveal-card" id="revealCard">
+    <div class="reveal-header">
+      <div class="reveal-top">
+        <div>
+          <div class="reveal-term" id="rc-term"></div>
+          <div class="reveal-reading" id="rc-reading"></div>
+          <div class="reveal-fullname" id="rc-fullname"></div>
+        </div>
+        <div class="rank-badge" id="rc-rank"></div>
+      </div>
+      <div class="meta-row" id="rc-meta"></div>
+      <div class="impact-wrap">
+        <div class="impact-label">実務インパクト</div>
+        <div class="impact-bar-bg"><div class="impact-bar" id="rc-impact-bar"></div></div>
+        <div class="impact-score" id="rc-impact-score"></div>
+      </div>
+    </div>
+    <div class="reveal-body">
+      <div>
+        <div class="reveal-section-title">📖 わかりやすい解説</div>
+        <div class="reveal-explanation" id="rc-explanation"></div>
+      </div>
+      <div class="reveal-example" id="rc-example"></div>
+      <div class="value-box">
+        <div class="vt">💡 覚えるとどうなる？</div>
+        <div class="vm" id="rc-value"></div>
+      </div>
+      <div class="xp-gain" id="rc-xp-gain">
+        <div class="xg" id="rc-xp-num">+30 XP</div>
+        <div class="xl">登録ボーナス獲得！</div>
+      </div>
+      <button class="btn-save" id="rc-save-btn" onclick="saveTerm()">✅ 図鑑に登録する</button>
+    </div>
+  </div>
+
+  <div class="manual-form" id="manualForm">
+    <div style="font-size:0.85rem;color:var(--muted);text-align:center;margin-bottom:4px;">データベースにない用語です。自分で入力して登録できます。</div>
+    <div class="form-row">
+      <div><div class="form-label">読み（かな）</div><input type="text" class="form-input" id="mfReading" placeholder="えるえるえむ"></div>
+      <div><div class="form-label">英語正式名</div><input type="text" class="form-input" id="mfEn" placeholder="Large Language Model"></div>
+    </div>
+    <div class="form-row">
+      <div>
+        <div class="form-label">カテゴリ</div>
+        <select class="form-select" id="mfCat">
+          <option value="AI">🤖 AI</option>
+          <option value="マーケティング">📈 マーケティング</option>
+          <option value="ビジネス">💼 ビジネス</option>
+          <option value="IT">💻 IT</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+      <div>
+        <div class="form-label">重要度</div>
+        <select class="form-select" id="mfRank">
+          <option value="S">S（最重要）</option>
+          <option value="A">A（重要）</option>
+          <option value="B" selected>B（普通）</option>
+          <option value="C">C（参考）</option>
+        </select>
+      </div>
+    </div>
+    <div><div class="form-label">実務インパクト（0〜100）</div><input type="number" class="form-input" id="mfImpact" min="0" max="100" value="70"></div>
+    <div><div class="form-label">解説（中学生でもわかる言葉で） *</div><textarea class="form-textarea" id="mfDesc" placeholder="例：超大量の文章を読んで学習した「言葉の達人AI」。質問すると答えてくれる。"></textarea></div>
+    <div><div class="form-label">使用例</div><input type="text" class="form-input" id="mfExample" placeholder="例：「LLMを使ってカスタマーサポートを自動化した」"></div>
+    <div><div class="form-label">覚えるとどうなる？</div><input type="text" class="form-input" id="mfValue" placeholder="例：AIツール選定の判断が速くなる"></div>
+    <button class="btn-save" onclick="saveManual()">✅ 図鑑に登録する</button>
+  </div>
+</div>
+
+<!-- LIBRARY -->
+<div class="screen" id="screen-library">
+  <div class="lib-controls">
+    <input type="text" class="lib-search" id="libSearch" placeholder="🔍 検索...">
+    <button class="sort-toggle active" id="sortJa" onclick="setSortMode('ja')">あいうえお順</button>
+    <button class="sort-toggle" id="sortEn" onclick="setSortMode('en')">ABC順</button>
+  </div>
+  <div class="index-bar" id="libIndex"></div>
+  <div id="libContent"></div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-wrap" id="quizWrap"></div>
+</div>
+
+<!-- LEVELUP -->
+<div class="levelup-overlay" id="levelupOverlay">
+  <div class="levelup-box">
+    <div class="levelup-emoji">🎉</div>
+    <div class="levelup-text" id="luText">レベルアップ！</div>
+    <div class="levelup-sub" id="luSub"></div>
+    <button class="levelup-close" onclick="closeLevelup()">やったー！</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// KNOWLEDGE BASE（非表示・自動入力用）
+// ═══════════════════════════════════════════
+const KB = {
+  "LLM":{ fullName:"Large Language Model", reading:"えるえるえむ", cat:"AI", rank:"S", impact:95, freq:"高", explanation:"超大量の文章を読んで学習した「言葉の達人AI」。質問したら答えてくれるし、文章も書いてくれる。ChatGPTやClaudeがこれ。頭の中に何百億もの言葉のパターンが入っていて、次に来る言葉を予測しながら文章を作り続ける。", example:"「ChatGPTに企画書を書いてもらう」は、LLMに仕事を頼んでいること。", value:"これを理解すると、「なぜAIが賢いのか」の根本が分かり、AI活用ツールの選定や導入提案ができるようになります。" },
+  "RAG":{ fullName:"Retrieval-Augmented Generation", reading:"らぐ", cat:"AI", rank:"S", impact:92, freq:"高", explanation:"AIが答える前に「本棚で調べてから答える」仕組み。ただ記憶で答えるより、正確な情報を見つけてから答えるので、でたらめを言いにくくなる。社内マニュアルや最新情報を使わせるときに必須。", example:"「社内のFAQをRAGでAIに参照させて、正確な答えを返させる」", value:"これを理解すると、AIが間違えたときの原因と対策が分かり、実務AIシステムの設計提案ができます。" },
+  "GPT":{ fullName:"Generative Pre-trained Transformer", reading:"じーぴーてぃー", cat:"AI", rank:"S", impact:90, freq:"高", explanation:"OpenAIが作った大規模AIのシリーズ名。ChatGPTの頭脳部分。事前に大量の文章で学習（Pre-trained）してから、追加学習で使いやすくした。GPT-4oが現在の最新版。", example:"「GPT-4oで画像を読み込んでレポートを生成した」", value:"AI業界の共通語なので、ニュースや会議でよく出てくる。知っているだけで話についていけます。" },
+  "API":{ fullName:"Application Programming Interface", reading:"えーぴーあい", cat:"AI", rank:"S", impact:88, freq:"高", explanation:"ソフトウェア同士が「注文を届けるウェイター」のように情報をやり取りする仕組み。「AIのAPIを使う」＝AIの機能をボタン一つで自分のサービスに組み込める。", example:"「ChatGPT APIを使ってSlackボットを作った」", value:"これを理解すると、「AIをうちのシステムに組み込む」ときに何が必要かの会話についていけます。" },
+  "プロンプト":{ fullName:"Prompt", reading:"ぷろんぷと", cat:"AI", rank:"S", impact:90, freq:"高", explanation:"AIへの「指示文」のこと。同じAIでも指示の書き方次第で答えが全然変わる。うまい指示の書き方を学ぶことを「プロンプトエンジニアリング」という。", example:"「プロンプトに『小学生でもわかるように』と書いたら解説が分かりやすくなった」", value:"これを理解すると、AIから欲しい答えを引き出せるようになり、業務効率が大幅に上がります。" },
+  "ハルシネーション":{ fullName:"Hallucination", reading:"はるしねーしょん", cat:"AI", rank:"S", impact:88, freq:"高", explanation:"AIが「自信満々に嘘をつく」現象。存在しない本のタイトルや間違った数字を本当のことのように言ってしまう。「AIが幻覚を見ている」状態。RAGや事実確認で対策できる。", example:"「AIが実在しない論文を引用してしまった→ハルシネーションの典型例」", value:"これを知っているだけで、AI出力を盲信せず検証する習慣が身につき、ミスを防げます。" },
+  "ファインチューニング":{ fullName:"Fine-tuning", reading:"ふぁいんちゅーにんぐ", cat:"AI", rank:"A", impact:82, freq:"中", explanation:"すでに賢いAIに「うちの会社専用の教科書」を追加で読ませて、さらに専門化させること。一から鍛えるより圧倒的に安くて速い。", example:"「医療専門用語でファインチューニングしたAIを病院に導入した」", value:"これを理解すると、AIカスタマイズの選択肢（RAG vs ファインチューニング）を判断できるようになります。" },
+  "エージェント":{ fullName:"AI Agent", reading:"えーじぇんと", cat:"AI", rank:"S", impact:93, freq:"高", explanation:"自分で考えて行動できるAI。「これをやって」と命令すると、計画を立てて・ツールを使って・自動で複数ステップを実行してくれる。人間が一々指示しなくていい。", example:"「AIエージェントがWebを検索→まとめ→Slackに投稿まで自動でやってくれた」", value:"AIが「使うもの」から「働くもの」に変わる転換点。これを知ると次世代AI活用の議論ができます。" },
+  "マルチモーダル":{ fullName:"Multimodal", reading:"まるちもーだる", cat:"AI", rank:"A", impact:85, freq:"高", explanation:"テキスト・画像・音声・動画など、複数の種類の情報を同時に扱えるAI。「文章も画像も両方分かる」AI。GPT-4oやGeminiがこれ。", example:"「製品写真を貼り付けて『この商品の特徴を説明して』と聞いた」", value:"画像入りの業務資料や図面をAIに読み込ませる提案ができるようになります。" },
+  "ベクトルDB":{ fullName:"Vector Database", reading:"べくとるでーたべーす", cat:"AI", rank:"A", impact:78, freq:"中", explanation:"文章の「意味の近さ」で高速に検索できる特殊なデータベース。「同じ言葉」ではなく「似た意味」を探せるのが特徴。RAGシステムの核心部分。", example:"「FAQをベクトルDBに入れて、似た質問を自動で見つけるシステムを作った」", value:"RAGやAI検索システムの設計話で出てくる。知っているとエンジニアとの会話が弾みます。" },
+  "トークン":{ fullName:"Token", reading:"とーくん", en:"Token", cat:"AI", rank:"A", impact:80, freq:"高", explanation:"AIが文章を処理するときの最小単位。日本語は1〜3文字が1トークンくらい。AIの料金は「何トークン使ったか」で決まることが多い。長い文章を送るほど高くなる。", example:"「プロンプトが長すぎてトークン数が上限を超えてしまった」", value:"AIコストを試算したり、プロンプトを最適化する際に必須の知識です。" },
+  "CoT":{ fullName:"Chain of Thought", reading:"しぇーんおぶそーと", cat:"AI", rank:"A", impact:78, freq:"中", explanation:"AIに「ステップbyステップで考えて」と頼む方法。複雑な問題を解くときに、答えを直接出すより、過程を説明させた方が正確になる。", example:"「『順を追って考えてください』と追加したら計算ミスが減った」", value:"プロンプトに一言加えるだけで精度が上がる。すぐ使える超実用的な知識です。" },
+  "エンベディング":{ fullName:"Embedding", reading:"えんべでぃんぐ", cat:"AI", rank:"A", impact:75, freq:"中", explanation:"文章や言葉を「数字の座標」に変換する技術。「猫」と「ネコ」は座標が近く、「猫」と「車」は遠い。この座標のことをベクトルと呼ぶ。意味の近さを数値化できる。", example:"「商品レビューをエンベディングして似た口コミをまとめた」", value:"AI検索・レコメンド・分類などの仕組みを理解する基礎。RAGの話で必ず出てきます。" },
+  "生成AI":{ fullName:"Generative AI", reading:"せいせいえーあい", cat:"AI", rank:"S", impact:95, freq:"高", explanation:"文章・画像・音楽・動画など「新しいコンテンツを作り出す」AIの総称。ChatGPT・Midjourney・Suno（音楽）などがみんなこれ。今のAIブームの中心。", example:"「生成AIで広告画像を100パターン自動生成した」", value:"AIに関する会議・ニュース・提案書で必ず出る最重要ワード。知らないと話についていけません。" },
+  "機械学習":{ fullName:"Machine Learning", reading:"きかいがくしゅう", cat:"AI", rank:"A", impact:82, freq:"高", explanation:"コンピュータが大量のデータからパターンを自動で学ぶ技術。人間がルールを一つ一つ教えなくても、データを見せると勝手に賢くなる。ディープラーニングはその進化版。", example:"「機械学習で過去の売上データから需要予測モデルを作った」", value:"AI・データサイエンスの会話の共通基盤。土台として知っておくと他の用語理解が速くなります。" },
+  "ディープラーニング":{ fullName:"Deep Learning", reading:"でぃーぷらーにんぐ", cat:"AI", rank:"A", impact:80, freq:"高", explanation:"人間の脳の神経をマネした「多層構造」で学習する機械学習の一種。層が「深い（Deep）」のでこの名前。画像認識や言語理解を劇的に進歩させた技術。", example:"「ディープラーニングで顔認証システムを開発した」", value:"「なぜ今のAIはこんなに賢いのか」の根本的な答え。知っているとAIの強みと限界を理解できます。" },
+  "RLHF":{ fullName:"Reinforcement Learning from Human Feedback", reading:"あーるえるえいちえふ", cat:"AI", rank:"A", impact:76, freq:"中", explanation:"人間が「いい答え」と「悪い答え」を評価して、AIを人間の好みに合わせて調整する学習方法。ChatGPTが「丁寧で役立つ答え」を返せるのはこれのおかげ。", example:"「RLHFのおかげでAIが有害な回答を自制できるようになった」", value:"「なぜChatGPTはちゃんとした言葉遣いをするのか」が分かる。AI倫理の会話でも使えます。" },
+
+  "KPI":{ fullName:"Key Performance Indicator", reading:"けーぴーあい", cat:"マーケティング", rank:"S", impact:95, freq:"高", explanation:"「目標に向けて今どこにいるか」を測る数字のこと。サッカーで言えばゴール数・シュート率みたいなもの。CVR・CTR・売上など業務によって違う。", example:"「今月のKPIはCVR 3%、先月は2.1%だった」", value:"ビジネスのほぼ全シーンで出てくる。意味が分かるだけで会議の理解度が激変します。" },
+  "ROI":{ fullName:"Return on Investment", reading:"あーるおーあい", cat:"マーケティング", rank:"S", impact:92, freq:"高", explanation:"「投資してどれだけ儲かったか」の割合。100万円使って150万円の利益が出たらROI 150%。数字が高いほど効率が良い施策。", example:"「この広告施策のROIは200%だった」", value:"施策の費用対効果を一言で伝えられる。提案書・報告書で必ず使います。" },
+  "CVR":{ fullName:"Conversion Rate", reading:"しーぶいあーる", cat:"マーケティング", rank:"S", impact:90, freq:"高", explanation:"「来たお客さんのうち、実際に買ってくれた（行動してくれた）割合」。100人来て3人買ったらCVR3%。Webマーケの最重要指標の一つ。", example:"「LPのCVRを1.2%から2.5%に改善した」", value:"マーケの成果を語るとき必ず出る。理解していないと報告書や会議で迷子になります。" },
+  "CTA":{ fullName:"Call to Action", reading:"しーてぃーえー", cat:"マーケティング", rank:"S", impact:88, freq:"高", explanation:"「ユーザーに次の行動をしてもらうボタンや文章」。「今すぐ申し込む」「無料で試す」など。これが弱いと、良いページでもコンバージョンが上がらない。", example:"「CTAを『詳しくはこちら』から『今すぐ無料で試す』に変えたらCVRが上がった」", value:"LP・メール・広告すべてに関わる。デザイン・コピーの改善提案に使える知識です。" },
+  "CTR":{ fullName:"Click Through Rate", reading:"しーてぃーあーる", cat:"マーケティング", rank:"A", impact:85, freq:"高", explanation:"「見た人のうち、クリックした人の割合」。広告が1000回表示されて30回クリックされたらCTR3%。数字が高いほど興味を引けている証拠。", example:"「バナーのCTRが0.5%から1.2%に改善した」", value:"広告・メール・SNS全ての効果測定に出てくる基本指標です。" },
+  "LTV":{ fullName:"Lifetime Value", reading:"えるてぃーぶい", cat:"マーケティング", rank:"S", impact:90, freq:"高", explanation:"「1人のお客さんが一生涯でいくら使ってくれるか」。月1万円を3年使ったらLTV36万円。これが高いほど、獲得コストをかけても元が取れる。", example:"「LTVを高めるためにリピート購入を促すメールを設計した」", value:"サブスクやEC事業の根幹指標。事業戦略の議論で必ず出てきます。" },
+  "SEO":{ fullName:"Search Engine Optimization", reading:"えすいーおー", cat:"マーケティング", rank:"S", impact:88, freq:"高", explanation:"Googleで上位に表示されるように工夫すること。良い記事を書いたり、サイトを速くしたり、他のサイトから紹介されたりすることで順位が上がる。", example:"「SEO記事を月10本書いてオーガニック流入を3倍にした」", value:"広告費ゼロで集客できる最強の資産。概念を知っているだけでコンテンツ戦略の議論ができます。" },
+  "ROAS":{ fullName:"Return on Advertising Spend", reading:"ろあす", cat:"マーケティング", rank:"A", impact:85, freq:"高", explanation:"「広告費1円に対して何円の売上が出たか」。1万円の広告で3万円売れたらROAS300%。ROIと似ているが、広告費だけに特化した指標。", example:"「ROASが300%を超えたキャンペーンに予算を集中させた」", value:"広告運用の会話で毎回出てくる。知っていると広告代理店との会話がスムーズになります。" },
+  "CPA":{ fullName:"Cost Per Acquisition", reading:"しーぴーえー", cat:"マーケティング", rank:"A", impact:83, freq:"高", explanation:"「1件の成果（購入・申込）を得るためにかかった広告費」。10万円使って20件の申込があったらCPA5,000円。これを目標内に収めるのが広告の仕事。", example:"「CPAを5,000円以内に抑えるように入札を調整した」", value:"広告を出している職種なら必須知識。目標設定と改善の会話で毎回使います。" },
+  "CRM":{ fullName:"Customer Relationship Management", reading:"しーあーるえむ", cat:"マーケティング", rank:"A", impact:85, freq:"高", explanation:"「お客さんの情報をまとめて、良い関係を続けるための仕組みやツール」。名前・購入履歴・メールのやり取りを一元管理する。SalesforceやHubSpotが有名。", example:"「CRMでお客さんの購買履歴を見ながら最適なタイミングでメールを送った」", value:"営業・マーケ・CS職なら必須ワード。ツール選定の議論でも必ず出てきます。" },
+  "ペルソナ":{ fullName:"Persona", reading:"ぺるそな", cat:"マーケティング", rank:"A", impact:80, freq:"高", explanation:"「典型的なお客さんを具体的な一人の人物として描いたもの」。年齢・職業・悩み・休日の過ごし方まで詳しく設定する。ペルソナがぼんやりしていると施策がズレる。", example:"「ペルソナは35歳女性・フルタイム勤務・料理時間を減らしたい人」", value:"マーケ・企画・営業すべての土台。会議で「ペルソナは？」と聞けるようになるだけで提案力が上がります。" },
+  "ファネル":{ fullName:"Funnel", reading:"ふぁねる", cat:"マーケティング", rank:"A", impact:83, freq:"高", explanation:"お客さんが「知る→興味→検討→買う」と進むときに人数がだんだん絞られる、漏斗（じょうご）型の流れのこと。どの段階でお客さんが離れているかを分析する。", example:"「ミドルファネルのコンテンツが弱くて検討段階で離脱している」", value:"マーケ戦略の話で必ず出る。「どこを強化すれば売上が上がるか」を議論できるようになります。" },
+  "グロースハック":{ fullName:"Growth Hack", reading:"ぐろーすはっく", cat:"マーケティング", rank:"A", impact:80, freq:"中", explanation:"データを分析しながら実験を繰り返して、低コストで急成長を狙うマーケティング手法。「ちょっと変えてみた→効果確認→また変える」を高速で回す。", example:"「バイラルループを設計してグロースハックでユーザー数を3倍にした」", value:"スタートアップや新規事業の文脈で頻出。成長施策の議論でこの言葉を使えると一目置かれます。" },
+  "A/Bテスト":{ fullName:"A/B Test", reading:"えーびーてすと", cat:"マーケティング", rank:"A", impact:85, freq:"高", explanation:"「2つのバージョンを同時に試してどちらが良いか実験する」方法。AはボタンA、BはボタンBを半分ずつのユーザーに見せて、クリック率を比べる。感覚でなくデータで判断できる。", example:"「CTA文言のA/Bテストで、Bパターンの方がCVR30%高かった」", value:"「改善の意思決定をデータでする」という考え方の基本。マーケ・UXで必須の知識です。" },
+  "ナーチャリング":{ fullName:"Nurturing", reading:"なーちゃりんぐ", cat:"マーケティング", rank:"A", impact:78, freq:"中", explanation:"「すぐ買わないお客さんを、少しずつ育てて買う気にさせること」。資料をダウンロードした人に役立つメールを送り続けて、タイミングが来たとき最初に思い出してもらう。", example:"「展示会のリードをナーチャリングメールで3ヶ月かけて温めた」", value:"BtoB営業・マーケの鉄板手法。MAツールと組み合わせた自動化提案ができるようになります。" },
+  "UGC":{ fullName:"User Generated Content", reading:"ゆーじーしー", cat:"マーケティング", rank:"A", impact:80, freq:"中", explanation:"「ユーザー自身が作ったコンテンツ」。インスタの投稿・Amazonのレビュー・Twitterの感想ツイートなど。企業が作る広告より信頼される傾向がある。", example:"「お客さんのUGCをInstagramの公式アカウントで紹介して、エンゲージメントが増えた」", value:"SNS戦略やD2Cブランドの話でよく出る。UGCを活用した施策提案ができるようになります。" },
+  "オーガニック":{ fullName:"Organic", reading:"おーがにっく", cat:"マーケティング", rank:"A", impact:80, freq:"高", explanation:"「広告費をかけずに自然に集まってきた」こと。SEOで検索上位になって来た人・SNSで自然に拡散されたフォロワーなどがオーガニック。広告と区別して使う。", example:"「オーガニック流入が全体の60%を占めている」", value:"集客施策の議論で必ず出てくる。有料と無料の集客を整理して語れるようになります。" },
+  "エンゲージメント":{ fullName:"Engagement", reading:"えんげーじめんと", cat:"マーケティング", rank:"A", impact:82, freq:"高", explanation:"「ユーザーがコンテンツに対して能動的に反応した量・率」。いいね・コメント・シェア・保存がエンゲージメント。フォロワーが多くてもエンゲージメントが低いと意味がない。", example:"「フォロワーは多いがエンゲージメント率が0.3%と低い」", value:"SNS運用・インフルエンサー選定で必須。数字の裏にある「本当の熱量」を読む指標です。" },
+  "リテンション":{ fullName:"Retention", reading:"りてんしょん", cat:"マーケティング", rank:"A", impact:85, freq:"中", explanation:"「既存のお客さんに使い続けてもらう」こと。新規客を獲得するより、今いるお客さんを維持する方がコストが安い。サブスク事業では最重要テーマ。", example:"「リテンション率を上げるためにオンボーディングを改善した」", value:"SaaSやサブスクビジネスの文脈で頻出。LTVと合わせて理解するとビジネスの全体像が見えます。" },
+};
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const STORE_KEY = 'yokomoji_hunter_v2';
+let state = loadState();
+let currentTerm = null;
+let quizData = null;
+let sortMode = 'ja';
+
+function loadState() {
+  try { const s = localStorage.getItem(STORE_KEY); if(s) return JSON.parse(s); } catch(e){}
+  return { terms: [], xp: 0, level: 1, streak: 0, lastDate: null };
+}
+function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+// ═══════════════════════════════════════════
+// XP / LEVEL
+// ═══════════════════════════════════════════
+const LEVEL_XP = [0,0,100,250,500,900,1400,2000,2800,3800,5000];
+function xpForNextLevel(lv) { return LEVEL_XP[Math.min(lv+1, LEVEL_XP.length-1)] || 9999; }
+function xpForThisLevel(lv) { return LEVEL_XP[Math.min(lv, LEVEL_XP.length-1)] || 0; }
+
+function addXP(amount) {
+  const before = state.level;
+  state.xp += amount;
+  while (state.level < LEVEL_XP.length-1 && state.xp >= xpForNextLevel(state.level)) {
+    state.level++;
+  }
+  updateNavXP();
+  if (state.level > before) showLevelup(state.level);
+}
+
+function updateNavXP() {
+  document.getElementById('navLevel').textContent = 'Lv.' + state.level;
+  const base = xpForThisLevel(state.level);
+  const next = xpForNextLevel(state.level);
+  const pct = next > base ? Math.min(100, (state.xp - base) / (next - base) * 100) : 100;
+  document.getElementById('navXpFill').style.width = pct + '%';
+}
+
+function showLevelup(lv) {
+  const messages = ['', '', '初めての一歩！', '視野が広がってきた！', '横文字の使い手に！', '頼れる存在になってきた！', 'プロの域に近づいてる！', 'もうベテランの顔つき！', 'チームのAI・マーケ担当！', 'ほぼ専門家レベル！', '横文字マスター！'];
+  document.getElementById('luText').textContent = `Lv.${lv} にレベルアップ！`;
+  document.getElementById('luSub').textContent = messages[Math.min(lv, messages.length-1)] || 'すごい！';
+  document.getElementById('levelupOverlay').classList.add('show');
+}
+function closeLevelup() { document.getElementById('levelupOverlay').classList.remove('show'); }
+
+// ═══════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.nav-btn[data-screen="${id}"]`).classList.add('active');
+  if (id === 'home') renderHome();
+  if (id === 'library') renderLibrary();
+  if (id === 'quiz') { quizData = null; renderQuiz(); }
+}
+document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => goScreen(b.dataset.screen)));
+
+// ═══════════════════════════════════════════
+// DISCOVER
+// ═══════════════════════════════════════════
+document.getElementById('discoverInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); lookupTerm(); }
+});
+
+function lookupTerm() {
+  const raw = document.getElementById('discoverInput').value.trim();
+  if (!raw) return;
+  const key = normalize(raw);
+  const data = findInKB(key);
+  document.getElementById('revealCard').style.display = 'none';
+  document.getElementById('manualForm').classList.remove('show');
+
+  if (data) {
+    currentTerm = { ...data, term: raw };
+    showRevealCard(currentTerm);
+  } else {
+    currentTerm = { term: raw };
+    document.getElementById('manualForm').classList.add('show');
+    document.getElementById('mfReading').focus();
+    document.getElementById('rc-save-btn') && (document.getElementById('rc-save-btn').className = 'btn-save');
+  }
+}
+
+function normalize(s) {
+  return s.trim().toUpperCase().replace(/\s+/g,'');
+}
+
+function findInKB(key) {
+  if (KB[key]) return KB[key];
+  // partial match
+  for (const k of Object.keys(KB)) {
+    if (k.toUpperCase() === key || normalize(k) === key) return KB[k];
+  }
+  return null;
+}
+
+function showRevealCard(data) {
+  const rc = document.getElementById('revealCard');
+  rc.style.display = 'block';
+  document.getElementById('rc-term').textContent = data.term;
+  document.getElementById('rc-reading').textContent = data.reading ? `（${data.reading}）` : '';
+  document.getElementById('rc-fullname').textContent = data.fullName || data.en || '';
+  // rank
+  const rk = data.rank || 'B';
+  const rb = document.getElementById('rc-rank');
+  rb.className = 'rank-badge rank-' + rk;
+  rb.textContent = rk;
+  // meta
+  document.getElementById('rc-meta').innerHTML = `
+    <div class="meta-tag"><span class="icon">📂</span><span class="label">カテゴリ</span><span class="val">${data.cat||'不明'}</span></div>
+    <div class="meta-tag"><span class="icon">🎯</span><span class="label">遭遇率</span><span class="val">${data.freq||'中'}</span></div>
+    <div class="meta-tag"><span class="icon">⭐</span><span class="label">重要度</span><span class="val">${rk}ランク</span></div>`;
+  // impact bar (animate)
+  const imp = data.impact || 70;
+  document.getElementById('rc-impact-bar').style.width = '0%';
+  setTimeout(() => { document.getElementById('rc-impact-bar').style.width = imp + '%'; }, 100);
+  document.getElementById('rc-impact-score').textContent = `実務インパクト ${imp}点`;
+  // body
+  document.getElementById('rc-explanation').textContent = data.explanation || '';
+  document.getElementById('rc-example').textContent = data.example ? `📌 使用例：${data.example}` : '';
+  document.getElementById('rc-value').textContent = data.value || 'この用語を理解することで、今後の調べ直しコストを大きく減らせる可能性があります。';
+  // xp
+  const xpGain = calcXPGain(data);
+  document.getElementById('rc-xp-num').textContent = `+${xpGain} XP`;
+  document.getElementById('rc-xp-gain').style.display = 'block';
+  // save button
+  const alreadySaved = state.terms.some(t => normalize(t.term) === normalize(data.term));
+  const btn = document.getElementById('rc-save-btn');
+  if (alreadySaved) {
+    btn.textContent = '✅ 登録済み';
+    btn.className = 'btn-save btn-saved';
+    btn.onclick = null;
+    document.getElementById('rc-xp-gain').style.display = 'none';
+  } else {
+    btn.textContent = '✅ 図鑑に登録する';
+    btn.className = 'btn-save';
+    btn.onclick = saveTerm;
+  }
+}
+
+function calcXPGain(data) {
+  const rankXP = { S:50, A:40, B:30, C:20 };
+  return rankXP[data.rank || 'B'] || 30;
+}
+
+function saveTerm() {
+  if (!currentTerm) return;
+  const alreadySaved = state.terms.some(t => normalize(t.term) === normalize(currentTerm.term));
+  if (alreadySaved) return;
+  const entry = { ...currentTerm, stars: 0, addedAt: Date.now() };
+  state.terms.unshift(entry);
+  const xpGain = calcXPGain(currentTerm);
+  addXP(xpGain);
+  checkStreak();
+  saveState();
+  const btn = document.getElementById('rc-save-btn');
+  btn.textContent = '✅ 登録完了！';
+  btn.className = 'btn-save btn-saved';
+  btn.onclick = null;
+  document.getElementById('rc-xp-gain').style.display = 'none';
+}
+
+function saveManual() {
+  const term = document.getElementById('discoverInput').value.trim();
+  const reading = document.getElementById('mfReading').value.trim();
+  const en = document.getElementById('mfEn').value.trim();
+  const cat = document.getElementById('mfCat').value;
+  const rank = document.getElementById('mfRank').value;
+  const impact = parseInt(document.getElementById('mfImpact').value) || 70;
+  const explanation = document.getElementById('mfDesc').value.trim();
+  const example = document.getElementById('mfExample').value.trim();
+  const value = document.getElementById('mfValue').value.trim();
+  if (!explanation) { alert('解説を入力してください'); return; }
+  const entry = { term, reading, fullName: en, cat, rank, impact, freq:'中', explanation, example, value, stars:0, addedAt:Date.now() };
+  const alreadySaved = state.terms.some(t => normalize(t.term) === normalize(term));
+  if (!alreadySaved) {
+    state.terms.unshift(entry);
+    addXP(calcXPGain(entry));
+    checkStreak();
+    saveState();
+  }
+  document.getElementById('manualForm').classList.remove('show');
+  showRevealCard(entry);
+  const btn = document.getElementById('rc-save-btn');
+  btn.textContent = '✅ 登録完了！';
+  btn.className = 'btn-save btn-saved';
+  btn.onclick = null;
+  document.getElementById('rc-xp-gain').style.display = 'none';
+}
+
+function checkStreak() {
+  const today = new Date().toDateString();
+  if (state.lastDate !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    state.streak = state.lastDate === yesterday ? (state.streak||0)+1 : 1;
+    state.lastDate = today;
+  }
+}
+
+// ═══════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════
+function renderHome() {
+  document.getElementById('homeXp').textContent = state.xp.toLocaleString();
+  document.getElementById('homeTotalTerms').textContent = state.terms.length;
+  document.getElementById('homeMastered').textContent = state.terms.filter(t=>t.stars>=3).length;
+  document.getElementById('homeStreak').textContent = state.streak || 0;
+  const recent = state.terms.slice(0,5);
+  const el = document.getElementById('recentList');
+  if (!recent.length) {
+    el.innerHTML = '<div class="empty-state"><div class="ei">📭</div><p>まだ用語がありません<br>横文字に出会ったら登録してみよう！</p></div>';
+    return;
+  }
+  el.innerHTML = recent.map(t => `
+    <div class="recent-card" onclick="goScreen('library')">
+      <div class="stars">${'⭐'.repeat(t.stars||0)}${'☆'.repeat(3-(t.stars||0))}</div>
+      <div>
+        <div class="rc-name">${esc(t.term)}</div>
+        <div class="rc-cat">${esc(t.cat||'')}</div>
+      </div>
+      <span class="mini-tag mini-rank-${t.rank||'B'}">${t.rank||'B'}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+// LIBRARY
+// ═══════════════════════════════════════════
+function setSortMode(m) {
+  sortMode = m;
+  document.getElementById('sortJa').classList.toggle('active', m==='ja');
+  document.getElementById('sortEn').classList.toggle('active', m==='en');
+  renderLibrary();
+}
+
+function renderLibrary() {
+  const query = document.getElementById('libSearch').value.trim().toLowerCase();
+  let filtered = state.terms.filter(t => {
+    if (!query) return true;
+    return (t.term+t.reading+t.fullName+t.explanation+(t.example||'')).toLowerCase().includes(query);
+  });
+  const sorted = [...filtered].sort((a,b) => {
+    if (sortMode === 'en') return a.term.localeCompare(b.term,'en',{sensitivity:'base'});
+    return ((a.reading||a.term).localeCompare(b.reading||b.term,'ja'));
+  });
+  const index = [];
+  sorted.forEach(t => {
+    const k = sortMode==='en' ? t.term[0].toUpperCase() : (t.reading||t.term)[0];
+    if (!index.includes(k)) index.push(k);
+  });
+  document.getElementById('libIndex').innerHTML = index.map(k =>
+    `<button class="idx-btn" onclick="document.getElementById('libg_${k}')?.scrollIntoView({behavior:'smooth'})">${k}</button>`
+  ).join('');
+  const cont = document.getElementById('libContent');
+  if (!sorted.length) { cont.innerHTML = '<div class="empty-state"><div class="ei">📖</div><p>用語がありません</p></div>'; return; }
+  let html = ''; let last = null;
+  sorted.forEach(t => {
+    const k = sortMode==='en' ? t.term[0].toUpperCase() : (t.reading||t.term)[0];
+    if (k !== last) { html += `<div class="lib-group-header" id="libg_${k}">${k}</div><div class="lib-cards">`; if(last!==null) html = html.replace(/<\/div>$/, '') + '</div>'; last = k; }
+    html += `<div class="lib-card">
+      <div class="lib-card-top">
+        <div>
+          <div class="lib-card-name">${esc(t.term)}</div>
+          <div class="lib-card-reading">${esc(t.reading||'')} ${t.fullName?'— '+esc(t.fullName):''}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="mini-tag mini-rank-${t.rank||'B'}">${t.rank||'B'}</span>
+          <span style="color:var(--accent2);font-size:0.8rem">${'⭐'.repeat(t.stars||0)}</span>
+        </div>
+      </div>
+      <div class="lib-card-desc">${esc(t.explanation||'')}</div>
+      <div class="lib-card-meta">
+        <span class="mini-tag">${esc(t.cat||'')}</span>
+        <span class="mini-tag">インパクト ${t.impact||'?'}点</span>
+        <span class="mini-tag">遭遇率 ${t.freq||'中'}</span>
+      </div>
+    </div>`;
+  });
+  if (last !== null) html += '</div>';
+  cont.innerHTML = html;
+}
+document.getElementById('libSearch').addEventListener('input', renderLibrary);
+
+// ═══════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════
+function startQuiz() { goScreen('quiz'); initQuiz(); }
+
+function initQuiz() {
+  if (state.terms.length < 2) {
+    document.getElementById('quizWrap').innerHTML = '<div class="quiz-empty"><div style="font-size:2.5rem">🧩</div><p style="margin-top:12px">クイズには2つ以上の用語が必要です。<br>まず横文字を登録しましょう！</p><br><button class="btn-primary" style="max-width:240px;margin:0 auto" onclick="goScreen(\'discover\')">用語を登録する</button></div>';
+    return;
+  }
+  const pool = [...state.terms].sort(() => Math.random()-0.5).slice(0, Math.min(10, state.terms.length));
+  quizData = { questions: pool, current: 0, correct: 0 };
+  renderQuizQuestion();
+}
+
+function renderQuiz() {
+  if (!quizData) {
+    document.getElementById('quizWrap').innerHTML = `<button class="btn-primary" onclick="initQuiz()">🧠 クイズを開始する</button>` + (state.terms.length < 2 ? '<div class="quiz-empty"><p>2つ以上の用語を登録するとクイズができます</p></div>' : '');
+  }
+}
+
+function renderQuizQuestion() {
+  const { questions, current } = quizData;
+  if (current >= questions.length) { renderQuizResult(); return; }
+  const q = questions[current];
+  const all = state.terms;
+  // make wrong choices
+  const wrongs = all.filter(t => normalize(t.term) !== normalize(q.term)).sort(() => Math.random()-0.5).slice(0, 3);
+  const choices = [...wrongs.map(t => t.explanation), q.explanation].sort(() => Math.random()-0.5);
+  const pct = (current/questions.length*100).toFixed(0);
+  document.getElementById('quizWrap').innerHTML = `
+    <div class="quiz-progress-text">${current+1} / ${questions.length}</div>
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
+    <div class="quiz-question">
+      <div class="quiz-q-label">この用語の意味は？</div>
+      <div class="quiz-term">${esc(q.term)}</div>
+      <div class="quiz-hint">${q.reading ? `（${q.reading}）` : ''}${q.fullName ? ' — '+q.fullName : ''}</div>
+    </div>
+    <div class="quiz-choices">
+      ${choices.map((c,i) => `<button class="quiz-choice" onclick="answerQuiz(this, ${choices.indexOf(q.explanation)===i}, ${questions.indexOf(q)})">${esc(c)}</button>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <button class="quiz-next" id="quizNext" onclick="nextQuestion()">次の問題へ →</button>`;
+}
+
+function answerQuiz(btn, isCorrect, qIdx) {
+  document.querySelectorAll('.quiz-choice').forEach(b => { b.disabled = true; });
+  if (isCorrect) {
+    btn.classList.add('correct');
+    quizData.correct++;
+    addXP(10);
+    // update stars
+    const t = quizData.questions[qIdx];
+    const idx = state.terms.findIndex(x => normalize(x.term)===normalize(t.term));
+    if (idx >= 0 && state.terms[idx].stars < 3) state.terms[idx].stars++;
+    saveState();
+    document.getElementById('quizFeedback').innerHTML = `<span style="color:var(--green);font-size:1.2rem">✅ 正解！</span><br>${esc(t.value||'この用語をしっかり理解しました！')}`;
+  } else {
+    btn.classList.add('wrong');
+    const correct = document.querySelectorAll('.quiz-choice')[quizData.questions[qIdx] ? 0 : 0];
+    document.querySelectorAll('.quiz-choice').forEach(b => { if (b.textContent === quizData.questions[quizData.current].explanation) b.classList.add('correct'); });
+    document.getElementById('quizFeedback').innerHTML = `<span style="color:var(--red);font-size:1.2rem">❌ 惜しい！</span><br>正解は上でハイライトされています。`;
+  }
+  document.getElementById('quizFeedback').classList.add('show');
+  document.getElementById('quizNext').classList.add('show');
+}
+
+function nextQuestion() {
+  quizData.current++;
+  renderQuizQuestion();
+}
+
+function renderQuizResult() {
+  const { correct, questions } = quizData;
+  const pct = Math.round(correct/questions.length*100);
+  const msg = pct===100 ? '🏆 完璧！全問正解！' : pct>=80 ? '🎉 素晴らしい！' : pct>=60 ? '👍 なかなか良い！' : '💪 もう一度チャレンジ！';
+  document.getElementById('quizWrap').innerHTML = `
+    <div class="quiz-result show">
+      <div style="font-size:2.5rem">🎯</div>
+      <div class="result-score">${correct} / ${questions.length}</div>
+      <div style="font-size:1.5rem;font-weight:800;margin-top:4px;color:var(--accent2)">${pct}%</div>
+      <div class="result-msg">${msg}</div>
+      <div style="margin-top:8px;font-size:0.82rem;color:var(--muted)">+${correct*10} XP 獲得！</div>
+      <button class="btn-primary" style="margin-top:20px" onclick="initQuiz()">もう一度</button>
+      <button class="btn-secondary" onclick="goScreen('library')">図鑑を見る</button>
+    </div>`;
+  quizData = null;
+}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ═══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════��════════
+updateNavXP();
+renderHome();
+</script>
+</body>
+</html>

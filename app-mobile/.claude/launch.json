@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Expo Start (default)",
+      "runtimeExecutable": "/Users/aveimac/Desktop/yokomoji-hunter/app-mobile/.claude/start-expo.sh",
+      "runtimeArgs": [],
+      "port": 8081,
+      "autoPort": true
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+# OS生成ファイル
+.DS_Store
+Thumbs.db
+
+# 依存パッケージ
+node_modules/
+
+# Expo / React Native
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+*.tsbuildinfo
+
+# ビルド成果物
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# デバッグ
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# 環境変数
+.env*.local
+
+# 提出素材・PDF
+06_提出素材一式/
+*.pdf

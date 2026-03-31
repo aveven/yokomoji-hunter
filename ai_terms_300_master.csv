@@ -1,0 +1,301 @@
+﻿総合順位,用語名,読み方,ランク,impact,category,小学生でもわかる解説,aliases
+1,AIエージェント,エーアイエージェント,S,100,agent_ai,人の代わりに考え、調べ、操作までして仕事を進める自律型AI。,ai agent|agentic ai
+2,生成AI,セイセイエーアイ,S,99,agent_ai,文章や画像など新しいものを自分で作り出せるAI。,generative ai|gen ai
+3,プロンプト,プロンプト,S,98,agent_ai,AIにやってほしいことを伝える指示文。,prompt
+4,プロンプトエンジニアリング,プロンプトエンジニアリング,S,98,agent_ai,AIからよい答えを引き出すために指示を工夫すること。,prompt engineering
+5,LLM,エルエルエム,S,97,agent_ai,たくさんの文章を学び、人のように言葉を扱うAIの頭脳。,large language model|大規模言語モデル
+6,RAG,ラグ,S,97,agent_ai,外の資料を探してから答えることで、AIのウソを減らす仕組み。,retrieval augmented generation
+7,ハルシネーション,ハルシネーション,S,96,agent_ai,AIが本当ではないことを自信ありげに答えてしまうこと。,hallucination
+8,API,エーピーアイ,S,96,it_dev,アプリどうしが情報をやり取りするためのつなぎ口。,api|application programming interface
+9,ワークフロー,ワークフロー,S,95,agent_ai,作業をどの順番で進めるかを決めた流れ。,workflow
+10,自動化,ジドウカ,S,95,agent_ai,人が手でやっていた作業を、AIや仕組みで自動にすること。,automation
+11,メモリ,メモリ,S,94,agent_ai,AIが会話や設定を覚えて次に活かすための記憶。,memory
+12,Function Calling,ファンクションコーリング,S,94,agent_ai,AIが外部ツールや処理を呼び出して使う仕組み。,tool calling|function calling
+13,ツール呼び出し,ツールヨビダシ,S,94,agent_ai,AIが外部の道具を使って調査や実行を進めること。,tool use
+14,マルチモーダルAI,マルチモーダルエーアイ,S,93,agent_ai,文字だけでなく画像や音声もまとめて理解できるAI。,multimodal ai
+15,コンテキストウィンドウ,コンテキストウィンドウ,S,93,agent_ai,AIが一度に覚えて見ながら考えられる情報量。,context window
+16,トークン,トークン,S,92,agent_ai,AIが文章を数えるときの細かい単位。,token
+17,ベクトルデータベース,ベクトルデータベース,S,92,ai_data,似ている情報を探しやすい形で保存する特別なデータベース。,vector database
+18,Embedding,エンベディング,S,92,ai_data,言葉や画像の意味を数字に変えて、近さを比べやすくしたもの。,embedding|埋め込み
+19,埋め込み,ウメコミ,S,92,ai_data,言葉の意味を数字の並びに変えること。,embedding
+20,エージェント型AI,エージェントガタエーアイ,S,91,agent_ai,自分で考えながら複数の手順をこなすAI。,agentic ai|AIエージェント
+21,SaaS,サース,S,91,it_dev,ネット経由で使うソフトサービス。,saas|software as a service
+22,ノーコード,ノーコード,S,90,it_dev,プログラムを書かずに画面操作中心でアプリを作る方法。,no code
+23,ローコード,ローコード,S,90,it_dev,少しだけコードを書いて効率よくアプリを作る方法。,low code
+24,Dify,ディファイ,S,90,agent_ai,コードをあまり書かずにAIアプリやフローを作れるツール。,dify
+25,MCP,エムシーピー,S,90,agent_ai,AIが外部ツールやデータにつながるための共通の接続方式。,model context protocol
+26,推論,スイロン,S,89,agent_ai,AIが材料をもとに考えて答えを出すこと。,inference
+27,推論コスト,スイロンコスト,A,89,agent_ai,AIが考えるたびにかかる時間やお金の負担。,inference cost
+28,システムプロンプト,システムプロンプト,A,89,agent_ai,AIの基本ルールや役割を最初に決める指示。,system prompt
+29,ユーザープロンプト,ユーザープロンプト,A,88,agent_ai,利用者がその場でAIに送るお願いや質問。,user prompt
+30,チェーン・オブ・ソート,チェーンオブソート,A,88,agent_ai,考える手順を段階的に整理して答えさせる考え方。,chain of thought
+31,ReAct,リアクト,A,88,agent_ai,考えることと行動することを交互に進めるAIのやり方。,react prompting
+32,プランニング,プランニング,A,88,agent_ai,何をどう進めるか、先に段取りを考えること。,planning
+33,サブタスク,サブタスク,A,87,agent_ai,大きな仕事を小さく分けた一つ一つの作業。,subtask
+34,評価器,ヒョウカキ,A,87,agent_ai,AIの答えがよいかどうかを点検する役。,evaluator
+35,ガードレール,ガードレール,A,87,agent_ai,AIが危ないことをしないように設ける安全ルール。,guardrail
+36,プロンプトテンプレート,プロンプトテンプレート,A,87,agent_ai,よく使う指示を再利用しやすくしたひな形。,prompt template
+37,Few-shot,フューショット,A,86,agent_ai,少しだけお手本を見せてAIに答え方を学ばせる方法。,few shot
+38,Zero-shot,ゼロショット,A,86,agent_ai,お手本なしでいきなりAIに答えさせる方法。,zero shot
+39,Fine-tuning,ファインチューニング,A,86,agent_ai,既に賢いAIを、目的に合わせて追加学習で調整すること。,fine tuning
+40,蒸留,ジョウリュウ,A,86,agent_ai,大きいAIの知識を小さいAIにうまく受け渡すこと。,distillation
+41,知識カットオフ,チシキカットオフ,A,85,agent_ai,AIが学習している情報の最終時点。,knowledge cutoff
+42,温度,オンド,A,85,agent_ai,AIの答えをどれくらい自由で多様にするかの設定。,temperature
+43,Top-p,トップピー,A,85,agent_ai,AIが候補をどこまで広く使って答えるかを決める設定。,top p
+44,最大出力トークン,サイダイシュツリョクトークン,A,84,agent_ai,AIが一回で出せる返答の長さの上限。,max tokens
+45,ストリーミング,ストリーミング,A,84,agent_ai,AIの答えを少しずつ表示して待ち時間を減らすこと。,streaming
+46,レイテンシ,レイテンシ,A,84,it_dev,反応が返るまでの遅れ時間。,latency
+47,キャッシュ,キャッシュ,A,84,it_dev,一度使った結果を一時保存して速くする仕組み。,cache
+48,セッション,セッション,A,83,it_dev,一連の利用や会話をひとまとまりとして扱う単位。,session
+49,認証,ニンショウ,A,83,it_dev,本人かどうかを確かめること。,authentication
+50,認可,ニンカ,A,83,it_dev,何をしてよいかの権限を決めること。,authorization
+51,OAuth,オーオース,A,83,it_dev,他のサービスのアカウントで安全に連携する仕組み。,oauth
+52,Webhook,ウェブフック,A,83,it_dev,何か起きた時に自動で別サービスへ知らせる仕組み。,webhook
+53,JSON,ジェイソン,A,82,it_dev,データをやり取りする時によく使う、見やすい書き方。,json
+54,YAML,ヤムル,A,82,it_dev,設定を書く時によく使う、読みやすい形式。,yaml
+55,SDK,エスディーケー,A,82,it_dev,アプリ開発に必要な道具や説明書のセット。,software development kit|sdk
+56,CLI,シーエルアイ,A,82,it_dev,文字で命令を打って操作する仕組み。,command line interface|cli
+57,GUI,ジーユーアイ,A,82,it_dev,ボタンや画面を見ながら操作する仕組み。,graphical user interface|gui
+58,クラウド,クラウド,A,81,it_dev,ネットの向こうの大きなコンピューターを使うこと。,cloud|cloud computing
+59,クラウドコンピューティング,クラウドコンピューティング,A,81,it_dev,自分の端末ではなくネット上の計算資源を使うこと。,cloud
+60,PaaS,パース,A,81,it_dev,アプリを作る土台をネットで借りられるサービス。,paas|platform as a service
+61,IaaS,イアース,A,81,it_dev,サーバーやネットワークなど基盤をネットで借りるサービス。,iaas|infrastructure as a service
+62,Serverless,サーバーレス,A,81,it_dev,サーバー管理を意識せず処理を動かせる仕組み。,serverless
+63,コンテナ,コンテナ,A,80,it_dev,アプリを動かす材料をひと箱にまとめる技術。,container
+64,Docker,ドッカー,A,80,it_dev,コンテナを作ったり動かしたりしやすくする代表的な道具。,docker
+65,Kubernetes,クバネティス,A,80,it_dev,たくさんのコンテナを自動で管理する仕組み。,k8s|kubernetes
+66,CI/CD,シーアイシーディー,A,80,it_dev,テストから公開までを自動で進める仕組み。,ci cd
+67,DevOps,デブオプス,A,80,it_dev,作る人と運用する人が協力して速く良くする考え方。,devops
+68,ログ,ログ,A,79,it_dev,何が起きたかを後から確認できる記録。,log
+69,監視,カンシ,A,79,it_dev,システムが元気に動いているか見守ること。,monitoring
+70,アラート,アラート,A,79,it_dev,異常があった時に知らせる警報。,alert
+71,Observability,オブザーバビリティ,A,79,it_dev,システムの中身を観察して問題の原因を追いやすくする考え方。,observability
+72,トレーシング,トレーシング,A,78,it_dev,処理がどこを通ったかを追跡すること。,tracing
+73,テスト,テスト,A,78,it_dev,作ったものが正しく動くか確認すること。,test
+74,ユニットテスト,ユニットテスト,A,78,it_dev,小さな部品ごとに正しいか確かめるテスト。,unit test
+75,E2Eテスト,イーツーイーテスト,A,78,it_dev,最初から最後まで一連の動きをまとめて試すテスト。,end to end test|e2e
+76,デバッグ,デバッグ,A,77,it_dev,不具合の原因を見つけて直す作業。,debug
+77,バグ,バグ,A,77,it_dev,プログラムの間違いや不具合。,bug
+78,デプロイ,デプロイ,A,77,it_dev,作ったアプリを本番で使えるように出すこと。,deploy
+79,リポジトリ,リポジトリ,A,77,it_dev,コードやファイルを保管する場所。,repository|repo
+80,Git,ギット,A,77,it_dev,コードの変更履歴を管理する道具。,git
+81,GitHub,ギットハブ,A,77,it_dev,Gitのコードを共有しやすくするサービス。,github
+82,ブランチ,ブランチ,A,76,it_dev,元のコードから分けて作業する別れ道。,branch
+83,マージ,マージ,A,76,it_dev,別々に作業した変更を一つにまとめること。,merge
+84,プルリクエスト,プルリクエスト,A,76,it_dev,変更を取り込んでよいか確認してもらう依頼。,pull request|pr
+85,コードレビュー,コードレビュー,A,76,it_dev,書いたコードを他の人に見てもらうこと。,code review
+86,ソースコード,ソースコード,A,76,it_dev,アプリを動かすための設計図になるコード。,source code
+87,フレームワーク,フレームワーク,A,75,it_dev,アプリ開発の土台になる便利な骨組み。,framework
+88,ライブラリ,ライブラリ,A,75,it_dev,よく使う部品をまとめた道具箱。,library
+89,React Native,リアクトネイティブ,A,75,it_dev,スマホアプリを作りやすくする技術。,react native
+90,Expo,エキスポ,A,75,it_dev,React Nativeの開発をラクにする仕組み。,expo
+91,TypeScript,タイプスクリプト,A,75,it_dev,JavaScriptをより安全に書きやすくした言語。,typescript|ts
+92,Python,パイソン,A,75,it_dev,AIや自動化でよく使われる読みやすい言語。,python
+93,SQL,エスキューエル,A,74,it_dev,データベースに命令するための言葉。,sql
+94,データベース,データベース,A,74,ai_data,情報を整理してためておく倉庫。,database|db
+95,データレイク,データレイク,A,74,ai_data,まだ整理されていない大量データをためておく場所。,data lake
+96,データウェアハウス,データウェアハウス,A,74,ai_data,分析しやすいよう整理したデータの倉庫。,data warehouse|dwh
+97,レイクハウス,レイクハウス,A,74,ai_data,データレイクと倉庫の良いところを合わせた仕組み。,lakehouse
+98,ビッグデータ,ビッグデータ,A,73,ai_data,とても量が多く種類も多いデータ群。,big data
+99,データサイエンス,データサイエンス,A,73,ai_data,データから役立つ発見をする学びや技術。,data science
+100,データマイニング,データマイニング,A,73,ai_data,大量のデータから隠れたルールを見つけること。,data mining
+101,テキストマイニング,テキストマイニング,A,73,ai_data,文章データから傾向や特徴を見つけること。,text mining
+102,機械学習,キカイガクシュウ,A,73,ai_data,AIがデータからパターンを学ぶこと。,machine learning|ml
+103,ディープラーニング,ディープラーニング,A,73,ai_data,機械学習の中でも特に複雑な学習をする方法。,deep learning
+104,教師データ,キョウシデータ,A,72,ai_data,問題と正解がセットになった学習用データ。,training label
+105,教師あり学習,キョウシアリガクシュウ,A,72,ai_data,正解を見せながら学ばせる機械学習。,supervised learning
+106,教師なし学習,キョウシナシガクシュウ,A,72,ai_data,正解なしで似たものを自分で見つける学習。,unsupervised learning
+107,強化学習,キョウカガクシュウ,A,72,ai_data,成功にごほうびを与えながら学ばせる方法。,reinforcement learning
+108,アノテーション,アノテーション,A,72,ai_data,データに正解ラベルを付ける作業。,annotation
+109,シンセティックデータ,シンセティックデータ,A,71,ai_data,本物に似せて人工的に作った学習用データ。,synthetic data
+110,特徴量,トクチョウリョウ,A,71,ai_data,AIが判断に使うために取り出した大事な情報。,feature
+111,モデル,モデル,A,71,ai_data,学習して答えを出せるようになったAIの本体。,model
+112,学習率,ガクシュウリツ,A,71,ai_data,AIがどれくらいの速さで学ぶかを決める設定。,learning rate
+113,過学習,カガクシュウ,A,71,ai_data,練習問題に慣れすぎて本番に弱くなること。,overfitting
+114,汎化,ハンカ,A,70,ai_data,見たことのない問題にも対応できる力。,generalization
+115,バリデーション,バリデーション,A,70,ai_data,学習したAIの実力を確かめる確認作業。,validation
+116,評価指標,ヒョウカシヒョウ,A,70,ai_data,モデルの良し悪しを測るものさし。,metric
+117,精度,セイド,A,70,ai_data,AIがどれだけ正しく当てられるかの割合。,accuracy
+118,再現率,サイゲンリツ,A,70,ai_data,本当は対象であるものをどれだけ見逃さず拾えたか。,recall
+119,適合率,テキゴウリツ,A,70,ai_data,AIが当たりと言った中で本当に当たりだった割合。,precision
+120,F1スコア,エフワンスコア,A,69,ai_data,再現率と適合率のバランスを見る点数。,f1 score
+121,ROC-AUC,ロックエーユーシー,A,69,ai_data,分類モデルの見分ける力を全体で見る指標。,roc auc
+122,NLP,エヌエルピー,A,69,ai_data,人の言葉をAIが扱えるようにする技術。,自然言語処理|nlp
+123,自然言語処理,シゼンゲンゴショリ,A,69,ai_data,人の話し言葉や文章を理解して使う技術。,nlp
+124,形態素解析,ケイタイソカイセキ,A,69,ai_data,文章を意味のある小さな言葉に分けること。,morphological analysis
+125,センチメント分析,センチメントブンセキ,A,69,ai_data,文章から喜びや不満など感情を読み取ること。,sentiment analysis
+126,固有表現抽出,コユウヒョウゲンチュウシュツ,A,68,ai_data,人名や会社名など特別な言葉を見つけること。,named entity recognition|ner
+127,画像認識,ガゾウニンシキ,A,68,ai_data,画像を見て何が写っているか判定する技術。,image recognition
+128,音声認識,オンセイニンシキ,A,68,ai_data,話し声を文字に変える技術。,speech recognition
+129,感情認識,カンジョウニンシキ,A,68,ai_data,声や表情から気持ちを推定する技術。,emotion recognition
+130,AI-OCR,エーアイオーシーアール,A,68,ai_data,文字を画像から読み取ってデータ化する技術。,ocr|ai ocr
+131,異常検知,イジョウケンチ,A,68,ai_data,いつもと違う怪しい動きを見つけること。,anomaly detection
+132,予知保全,ヨチホゼン,A,68,ai_data,壊れる前に故障を予想して先に対応すること。,predictive maintenance
+133,XAI,エックスエーアイ,A,67,ai_data,AIがなぜそう答えたか説明しやすくする考え方。,explainable ai|xai
+134,HITL,ヒューマンインザループ,A,67,agent_ai,AIの途中に人の確認を入れて安全にする仕組み。,human in the loop
+135,トキシシティ,トキシシティ,A,67,agent_ai,AIが人を傷つける表現を出してしまう危険。,toxicity
+136,バイアス,バイアス,A,67,ai_data,偏りのせいで判断が不公平になること。,bias
+137,プロンプトインジェクション,プロンプトインジェクション,A,67,agent_ai,悪い指示でAIのルールを崩そうとする攻撃。,prompt injection
+138,プロンプト防御,プロンプトボウギョ,A,67,agent_ai,AIが危ない指示にだまされないよう守る対策。,prompt defense
+139,レッドチーミング,レッドチーミング,A,66,agent_ai,わざと意地悪な質問をして弱点を探す安全確認。,red teaming
+140,安全性,アンゼンセイ,A,66,agent_ai,AIが人や社会に危険を出さず使えること。,safety
+141,透明性,トウメイセイ,A,66,agent_ai,AIの仕組みや判断理由が見えやすいこと。,transparency
+142,ゼロデータ保持,ゼロデータホジ,A,66,agent_ai,入力した情報を学習に使わず保存もしない考え方。,zero data retention
+143,プライバシー,プライバシー,A,66,agent_ai,個人の大事な情報を守ること。,privacy
+144,セキュリティ,セキュリティ,A,66,it_dev,情報やシステムを危険から守ること。,security
+145,認証基盤,ニンショウキバン,A,65,it_dev,ログインをまとめて安全に扱う土台。,identity platform
+146,多要素認証,タヨウソニンショウ,A,65,it_dev,複数の方法で本人確認する安全な仕組み。,mfa|multi factor authentication
+147,二段階認証,ニダンカイニンショウ,A,65,it_dev,二つの確認でログインを守る仕組み。,2fa|two factor authentication
+148,シングルサインオン,シングルサインオン,A,65,it_dev,一回のログインで複数サービスを使える仕組み。,sso|single sign on
+149,WAF,ワフ,A,65,it_dev,Webアプリを攻撃から守る見張り役。,waf|web application firewall
+150,ファイアウォール,ファイアウォール,A,65,it_dev,怪しい通信を止めるネットの防火壁。,firewall
+151,ゼロトラスト,ゼロトラスト,A,65,it_dev,誰も最初から信用しない前提で守る考え方。,zero trust
+152,フィッシング,フィッシング,A,64,it_dev,偽メールなどでパスワードを盗む詐欺。,phishing
+153,ランサムウェア,ランサムウェア,A,64,it_dev,データを人質にしてお金を要求する悪いソフト。,ransomware
+154,マルウェア,マルウェア,A,64,it_dev,害を与えるために作られた悪意あるソフトの総称。,malware
+155,情報セキュリティ,ジョウホウセキュリティ,A,64,it_dev,大事な情報を守り、安全に使えるようにすること。,cia security
+156,SLA,エスエルエー,B,64,business,サービス品質について交わす約束。,service level agreement|sla
+157,KPI,ケーピーアイ,B,64,business,ゴールに向かう途中の大事な指標。,kpi|key performance indicator
+158,KGI,ケージーアイ,B,64,business,最終的に達成したい大きな目標。,kgi|key goal indicator
+159,ROI,アールオーアイ,B,63,business,使ったお金に対してどれだけ効果が出たか。,return on investment|roi
+160,PoC,ピーオーシー,B,63,business,本格導入前に小さく試すこと。,proof of concept|poc
+161,MVP,エムブイピー,B,63,business,最低限の価値だけ入れてまず出す最初の版。,minimum viable product|mvp
+162,アジャイル開発,アジャイルカイハツ,B,63,business,小さく作って何度も直しながら進める作り方。,agile
+163,スクラム,スクラム,B,63,business,短い単位で協力して進める開発のやり方。,scrum
+164,スプリント,スプリント,B,63,business,短い期間で区切って開発を進める単位。,sprint
+165,カンバン,カンバン,B,62,business,作業の流れを見える化して進める方法。,kanban
+166,ウォーターフォール,ウォーターフォール,B,62,business,順番どおりに後戻り少なく進める開発のやり方。,waterfall
+167,ロードマップ,ロードマップ,B,62,business,これから何をどの順で進めるかの地図。,roadmap
+168,マイルストーン,マイルストーン,B,62,business,途中で達成したい大事な目印。,milestone
+169,アサイン,アサイン,B,62,business,人やAIに仕事を割り当てること。,assign
+170,タスク,タスク,B,62,business,一つ一つの具体的な作業。,task
+171,優先順位,ユウセンジュンイ,B,62,business,どれから先にやるかの順番。,priority
+172,プライオリティ,プライオリティ,B,62,business,優先して取り組む度合い。,priority
+173,リソース,リソース,B,61,business,人・時間・お金など使える資源。,resource
+174,ボトルネック,ボトルネック,B,61,business,全体の速さを止めている一番細い部分。,bottleneck
+175,デッドライン,デッドライン,B,61,business,絶対に守りたい締め切り。,deadline
+176,ASAP,アサップ,B,61,business,できるだけ早くという意味。,asap
+177,ペンディング,ペンディング,B,61,business,いったん保留にしておくこと。,pending
+178,リスケ,リスケ,B,61,business,予定を組み直すこと。,reschedule
+179,フィードバック,フィードバック,B,61,business,良かった点や直す点を返すこと。,feedback
+180,ブラッシュアップ,ブラッシュアップ,B,60,business,何度も磨いて良くすること。,brush up
+181,サマリー,サマリー,B,60,business,大事なところだけ短くまとめたもの。,summary
+182,アジェンダ,アジェンダ,B,60,business,会議で話す内容の予定表。,agenda
+183,コンセンサス,コンセンサス,B,60,business,みんなの合意。,consensus
+184,エビデンス,エビデンス,B,60,business,判断のもとになる証拠。,evidence
+185,スキーム,スキーム,B,60,business,全体の仕組みや枠組み。,scheme
+186,コミット,コミット,B,60,business,やり切ると約束して本気で取り組むこと。,commit
+187,マスト,マスト,B,60,business,必ずやるべきこと。,must
+188,ビジネスモデル,ビジネスモデル,B,59,business,どう価値を届けてどう稼ぐかの設計。,business model
+189,エコシステム,エコシステム,B,59,business,複数の会社やサービスが支え合う仕組み。,ecosystem
+190,プラットフォーム,プラットフォーム,B,59,business,多くの人やサービスが集まる土台。,platform
+191,プラットフォーマー,プラットフォーマー,B,59,business,大きな土台を持つ会社。,platformer
+192,ディスラプション,ディスラプション,B,59,business,新技術が古いやり方を大きく変えること。,disruption
+193,DX,ディーエックス,B,59,business,デジタルで仕事や会社を大きく良く変えること。,digital transformation|dx
+194,デジタイゼーション,デジタイゼーション,B,59,business,紙などをデータに変えること。,digitization
+195,デジタライゼーション,デジタライゼーション,B,58,business,デジタルで仕事のやり方自体を改善すること。,digitalization
+196,データドリブン,データドリブン,B,58,business,勘ではなくデータをもとに決めること。,data driven
+197,データドリブン経営,データドリブンケイエイ,B,58,business,経営判断をデータ中心で行うこと。,data driven management
+198,CRM,シーアールエム,B,58,business,お客さん情報を管理して関係を深める仕組み。,customer relationship management|crm
+199,SFA,エスエフエー,B,58,business,営業活動を見える化して助ける仕組み。,sales force automation|sfa
+200,MA,エムエー,B,58,business,見込み客対応を自動化する仕組み。,marketing automation|ma
+201,BI,ビーアイ,B,58,business,データをグラフなどで見やすくする仕組み。,business intelligence|bi
+202,CDO,シーディーオー,B,57,business,会社のデジタル変革を率いる責任者。,chief digital officer|cdo
+203,ERP,イーアールピー,B,57,business,会社全体の情報をまとめて管理する仕組み。,enterprise resource planning|erp
+204,SCM,エスシーエム,B,57,business,仕入れから配送までの流れを管理すること。,supply chain management|scm
+205,BPO,ビーピーオー,B,57,business,業務の一部を外部の専門会社に任せること。,business process outsourcing|bpo
+206,UI,ユーアイ,B,57,business,画面の見た目や操作部分のこと。,user interface|ui
+207,UX,ユーエックス,B,57,business,使った時に感じる体験の良さ。,user experience|ux
+208,アクセシビリティ,アクセシビリティ,B,57,business,誰でも使いやすい状態にすること。,accessibility
+209,ユーザビリティ,ユーザビリティ,B,56,business,迷わず使いやすい度合い。,usability
+210,ペルソナ,ペルソナ,B,56,business,想定する典型的なお客さん像。,persona
+211,ベネフィット,ベネフィット,B,56,business,お客さんが得られる本当の良いこと。,benefit
+212,ブランディング,ブランディング,B,56,business,選ばれる印象や価値を育てること。,branding
+213,LTV,エルティーブイ,B,56,business,一人のお客さんが長く生む価値。,life time value|ltv
+214,CVR,シーブイアール,B,56,business,来た人のうち行動してくれた割合。,conversion rate|cvr
+215,CTR,シーティーアール,B,55,business,見た人のうちクリックした割合。,click through rate|ctr
+216,CPA,シーピーエー,B,55,business,一件獲得するのにかかった費用。,cost per acquisition|cpa
+217,ROAS,ロアス,B,55,business,広告費に対して売上がどれだけ出たか。,return on ad spend|roas
+218,KPIツリー,ケーピーアイツリー,B,55,business,目標と途中指標のつながりを木のように見せたもの。,kpi tree
+219,OKR,オーケーアール,B,55,business,大きな目標と結果指標をセットで管理する方法。,okr|objectives and key results
+220,3C分析,サンシーブンセキ,B,55,business,お客・競合・自社の3つから考える方法。,3c
+221,4P分析,ヨンピーブンセキ,B,55,business,商品・価格・場所・宣伝で考える方法。,4p
+222,SWOT分析,スウォットブンセキ,B,55,business,強み弱み機会脅威で考える方法。,swot
+223,PEST分析,ペストブンセキ,B,54,business,政治経済社会技術の変化を見る方法。,pest
+224,WBS,ダブリュービーエス,B,54,business,仕事を細かく分けて見える化したもの。,work breakdown structure|wbs
+225,ガントチャート,ガントチャート,B,54,business,予定を横棒で見やすくした表。,gantt chart
+226,レポーティング,レポーティング,B,54,business,状況をまとめて報告すること。,reporting
+227,サブスクリプション,サブスクリプション,B,54,business,毎月など定期で料金を払って使う仕組み。,subscription
+228,フリーミアム,フリーミアム,B,54,business,基本無料で一部だけ有料にする仕組み。,freemium
+229,ローンチ,ローンチ,B,54,business,新しいサービスを世に出すこと。,launch
+230,PMF,ピーエムエフ,B,54,business,商品が市場にしっかり合っている状態。,product market fit|pmf
+231,オンボーディング,オンボーディング,B,53,business,初めて使う人が迷わず始められる案内。,onboarding
+232,チャーン,チャーン,B,53,business,サービスをやめて離れてしまうこと。,churn
+233,ナレッジ,ナレッジ,B,53,business,仕事に役立つ知識やコツ。,knowledge
+234,ノウハウ,ノウハウ,B,53,business,うまくやるための具体的なやり方。,know how
+235,会議,カイギ,B,53,business,話し合って決める場。,meeting
+236,アグリー,アグリー,B,53,business,賛成すること。,agree
+237,オンスケ,オンスケ,B,53,business,予定通り進んでいること。,on schedule
+238,キャパ,キャパ,B,52,business,対応できる量の限界。,capacity
+239,バッファ,バッファ,B,52,business,トラブルに備えた余裕。,buffer
+240,コスパ,コスパ,B,52,business,かけたものに対するお得さ。,cost performance
+241,シナジー,シナジー,B,52,business,組み合わせで相乗効果が出ること。,synergy
+242,ステークホルダー,ステークホルダー,B,52,business,関係するすべての人や組織。,stakeholder
+243,セグメント,セグメント,B,52,business,似たお客さんのまとまり。,segment
+244,BtoB,ビートゥービー,B,52,business,会社向けの商売。,b2b
+245,BtoC,ビートゥーシー,B,52,business,個人向けの商売。,b2c
+246,SEM,エスイーエム,B,51,business,検索から集客する考え方全体。,search engine marketing|sem
+247,SEO,エスイーオー,B,51,business,検索で上に出やすくする工夫。,search engine optimization|seo
+248,CMS,シーエムエス,B,51,business,Webサイトを管理しやすくする仕組み。,content management system|cms
+249,ソーシャルリスニング,ソーシャルリスニング,B,51,business,SNSの声を集めて調べること。,social listening
+250,レコメンデーション,レコメンデーション,B,51,business,おすすめを自動で出すこと。,recommendation
+251,スクレイピング,スクレイピング,B,51,it_dev,Webから必要情報を自動で集めること。,scraping
+252,オムニチャネル,オムニチャネル,C,50,business,どこからでも同じように買い物できる仕組み。,omnichannel
+253,キャッシュレス決済,キャッシュレスケッサイ,C,50,business,現金を使わず電子的に払うこと。,cashless
+254,FinTech,フィンテック,C,50,business,金融とITを組み合わせた技術。,fintech
+255,HR Tech,エイチアールテック,C,50,business,人事にITを活かす技術。,hr tech
+256,Health Tech,ヘルステック,C,50,business,医療や健康にITを活かす技術。,health tech
+257,InsurTech,インシュアテック,C,50,business,保険にITを活かす技術。,insurtech
+258,IoT,アイオーティー,C,50,it_dev,モノがネットにつながる仕組み。,internet of things|iot
+259,エッジAI,エッジエーアイ,C,50,ai_data,機械の近くでそのままAIを動かすこと。,edge ai
+260,エッジコンピューティング,エッジコンピューティング,C,50,it_dev,遠くに送らず近くで処理する技術。,edge computing
+261,M2M,エムツーエム,C,49,it_dev,機械どうしが自動で通信すること。,machine to machine|m2m
+262,スマートファクトリー,スマートファクトリー,C,49,business,AIやIoTで賢く動く工場。,smart factory
+263,予測分析,ヨソクブンセキ,C,49,ai_data,過去データから未来を予想する分析。,predictive analytics
+264,時系列データ,ジケイレツデータ,C,49,ai_data,時間順に並んだデータ。,time series
+265,クラスタリング,クラスタリング,C,49,ai_data,似たものをグループ分けすること。,clustering
+266,回帰分析,カイキブンセキ,C,49,ai_data,数字を予測する分析方法。,regression
+267,分類,ブンルイ,C,49,ai_data,どの種類に当てはまるかを分けること。,classification
+268,トランスフォーマー,トランスフォーマー,C,49,ai_data,今の生成AIの中心になっているモデル構造。,transformer
+269,自己注意機構,ジコチュウイキコウ,C,48,ai_data,文の中で大事な関係に注目する仕組み。,self attention
+270,位置エンコーディング,イチエンコーディング,C,48,ai_data,言葉の順番をAIに伝える工夫。,positional encoding
+271,デコーダ,デコーダ,C,48,ai_data,次の言葉を作り出す側の仕組み。,decoder
+272,エンコーダ,エンコーダ,C,48,ai_data,入力情報を理解しやすい形に変える仕組み。,encoder
+273,LoRA,ローラ,C,48,agent_ai,少ない計算でAIを調整しやすくする方法。,lora|low rank adaptation
+274,量子化,リョウシカ,C,48,agent_ai,AIモデルを軽くして動かしやすくすること。,quantization
+275,蒸発勾配,ジョウハツコウバイ,C,47,ai_data,深い学習で調整信号が弱くなりすぎる問題。,vanishing gradient
+276,勾配降下法,コウバイコウカホウ,C,47,ai_data,少しずつ間違いを減らして学習する方法。,gradient descent
+277,オプティマイザ,オプティマイザ,C,47,ai_data,学習をうまく進めるための更新ルール。,optimizer
+278,損失関数,ソンシツカンスウ,C,47,ai_data,どれくらい間違っているかを示す数字。,loss function
+279,正則化,セイソクカ,C,47,ai_data,過学習しすぎないように整える工夫。,regularization
+280,アテンション,アテンション,C,47,ai_data,どこに注目するかを決める仕組み。,attention
+281,ハイパーパラメータ,ハイパーパラメータ,C,46,ai_data,学習前に人が決める設定値。,hyperparameter
+282,データ前処理,データマエショリ,C,46,ai_data,学習前にデータを整える作業。,preprocessing
+283,欠損値,ケッソンチ,C,46,ai_data,抜けているデータ。,missing value
+284,外れ値,ハズレチ,C,46,ai_data,他と大きく違う値。,outlier
+285,正規化,セイキカ,C,46,ai_data,数字の幅をそろえて扱いやすくすること。,normalization
+286,標準化,ヒョウジュンカ,C,46,ai_data,平均やばらつきをそろえる変換。,standardization
+287,A/Bテスト,エービーテスト,C,46,business,二つを比べてどちらがよいか試す方法。,ab test
+288,3C,サンシー,C,46,business,顧客・競合・自社の3つで考えること。,3c
+289,スコープ,スコープ,C,45,business,今回やる範囲。,scope
+290,要件定義,ヨウケンテイギ,C,45,business,何を作るかを先に決めること。,requirements
+291,仕様,シヨウ,C,45,business,どう動くかを決めた内容。,spec
+292,仕様書,シヨウショ,C,45,business,仕様をまとめた文書。,spec document
+293,モックアップ,モックアップ,C,45,business,完成前の見た目イメージ。,mockup
+294,プロトタイプ,プロトタイプ,C,45,business,試しに動く形まで作った見本。,prototype
+295,ユーザーストーリー,ユーザーストーリー,C,45,business,利用者目線で書いたやりたいこと。,user story
+296,ジョブ理論,ジョブリロン,C,45,business,人が何を達成したくて商品を使うかを考える方法。,jobs to be done|jtbd
+297,PMBOK,ピンボック,C,44,business,プロジェクト管理の知識をまとめたガイド。,pmbok
+298,ITIL,アイティル,C,44,it_dev,IT運用をうまく進める考え方。,itil
+299,SPOC,スポック,C,44,business,問い合わせ窓口を一つにまとめること。,single point of contact|spoc
+300,CSIRT,シーサート,C,44,it_dev,セキュリティ事故に対応するチーム。,csirt
