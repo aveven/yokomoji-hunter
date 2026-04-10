@@ -146,6 +146,24 @@ nav {
   background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0;
   padding: 10px 14px; font-size: 0.88rem; line-height: 1.6; color: #ccc; font-style: italic;
 }
+/* 詳細展開ボタン */
+.detail-btn {
+  display: none; margin-top: 10px; padding: 7px 16px;
+  background: transparent; border: 1px solid var(--accent); color: var(--accent);
+  border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  transition: all 0.18s; letter-spacing: 0.03em;
+}
+.detail-btn:hover { background: var(--accent); color: #fff; }
+/* 詳細展開エリア */
+.detail-box {
+  display: none; margin-top: 12px;
+  background: var(--surface2); border-left: 3px solid var(--accent2);
+  border-radius: 0 12px 12px 0; padding: 14px 16px;
+  font-size: 0.88rem; line-height: 1.75; color: #ddd;
+  animation: fadeIn 0.25s ease;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+.detail-box .analogy-label { color: var(--accent2); font-weight: 700; }
 .value-box {
   background: linear-gradient(135deg, #1a1a2e, #16213e); border: 1px solid #2a2a5a;
   border-radius: 12px; padding: 14px 16px;
@@ -350,6 +368,8 @@ nav {
       <div>
         <div class="reveal-section-title">📖 わかりやすい解説</div>
         <div class="reveal-explanation" id="rc-explanation"></div>
+        <button class="detail-btn" id="rc-detail-btn" onclick="toggleDetail()">▼ もっと詳しく・例え話</button>
+        <div class="detail-box" id="rc-detail"></div>
       </div>
       <div class="reveal-example" id="rc-example"></div>
       <div class="value-box">
@@ -556,6 +576,18 @@ function showRevealCard(data) {
   document.getElementById('rc-impact-score').textContent = `実務インパクト ${imp}点`;
   // body
   document.getElementById('rc-explanation').textContent = data.explanation || '';
+  // 詳細・例え話ボタン
+  const detailBox = document.getElementById('rc-detail');
+  const detailBtn = document.getElementById('rc-detail-btn');
+  if (data.detail) {
+    detailBox.innerHTML = data.detail;
+    detailBox.style.display = 'none';
+    detailBtn.style.display = 'inline-block';
+    detailBtn.textContent = '▼ もっと詳しく・例え話';
+  } else {
+    detailBox.style.display = 'none';
+    detailBtn.style.display = 'none';
+  }
   document.getElementById('rc-example').textContent = data.example ? `📌 使用例：${data.example}` : '';
   document.getElementById('rc-value').textContent = data.value || 'この用語を理解することで、今後の調べ直しコストを大きく減らせる可能性があります。';
   // xp
@@ -575,6 +607,14 @@ function showRevealCard(data) {
     btn.className = 'btn-save';
     btn.onclick = saveTerm;
   }
+}
+
+function toggleDetail() {
+  const box = document.getElementById('rc-detail');
+  const btn = document.getElementById('rc-detail-btn');
+  const isOpen = box.style.display !== 'none';
+  box.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '▼ もっと詳しく・例え話' : '▲ 閉じる';
 }
 
 function calcXPGain(data) {
