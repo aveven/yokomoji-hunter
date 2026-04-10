@@ -69,6 +69,30 @@ function DetailContent({ termId }: DetailContentProps) {
       {/* 解説 */}
       <Text style={detailStyles.label}>解説</Text>
       <Text style={detailStyles.explanation}>{term.description}</Text>
+
+      {/* もっと詳しく・例え話 */}
+      {term.detail && (
+        <View style={detailStyles.detailBox}>
+          <Text style={detailStyles.detailLabel}>📖 もっと詳しく・例え話</Text>
+          <Text style={detailStyles.detailText}>{term.detail}</Text>
+        </View>
+      )}
+
+      {/* 使い方 */}
+      {term.usage && (
+        <View style={detailStyles.usageBox}>
+          <Text style={detailStyles.usageLabel}>💬 使い方</Text>
+          <Text style={detailStyles.usageText}>{term.usage}</Text>
+        </View>
+      )}
+
+      {/* 覚えるとどうなる */}
+      {term.value && (
+        <View style={detailStyles.valueBox}>
+          <Text style={detailStyles.valueLabel}>🚀 覚えるとどうなる</Text>
+          <Text style={detailStyles.valueText}>{term.value}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -483,6 +507,64 @@ const detailStyles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     lineHeight: 22,
+    marginBottom: 12,
+  },
+  detailBox: {
+    backgroundColor: '#f0f4ff',
+    borderLeftWidth: 3,
+    borderLeftColor: '#4A90E2',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+  },
+  detailLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#4A90E2',
+    marginBottom: 6,
+  },
+  detailText: {
+    fontSize: 13,
+    color: '#333',
+    lineHeight: 20,
+  },
+  usageBox: {
+    backgroundColor: '#f0faff',
+    borderLeftWidth: 3,
+    borderLeftColor: '#7ec8e3',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+  },
+  usageLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#0d8fa6',
+    marginBottom: 6,
+  },
+  usageText: {
+    fontSize: 13,
+    color: '#333',
+    lineHeight: 20,
+    fontStyle: 'italic',
+  },
+  valueBox: {
+    backgroundColor: '#fff8e1',
+    borderLeftWidth: 3,
+    borderLeftColor: '#F5A623',
+    borderRadius: 8,
+    padding: 12,
     marginBottom: 8,
+  },
+  valueLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#c87800',
+    marginBottom: 6,
+  },
+  valueText: {
+    fontSize: 13,
+    color: '#333',
+    lineHeight: 20,
   },
 });
