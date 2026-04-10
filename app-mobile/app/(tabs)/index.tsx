@@ -14,7 +14,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { termData, Rank } from '../../src/data/termData';
 
 // AsyncStorage の保存キー
-const STORAGE_KEY = 'yokomoji_learned_terms';
+const STORAGE_KEY    = 'yokomoji_learned_terms';
+const HISTORY_KEY    = 'yokomoji_learned_history'; // { termId: ISODateString }
 
 type TermItem = {
   id: string;
@@ -117,6 +118,13 @@ export default function DiscoverScreen() {
     const next = [...learnedIds, id];
     setLearnedIds(next);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    // 日付履歴を記録
+    try {
+      const raw = await AsyncStorage.getItem(HISTORY_KEY);
+      const history: Record<string, string> = raw ? JSON.parse(raw) : {};
+      history[id] = new Date().toISOString();
+      await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } catch { /* 履歴保存失敗は無視 */ }
   }, [learnedIds]);
 
   // モーダルを閉じる（クエリは維持）

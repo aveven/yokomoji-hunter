@@ -5,6 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Modal,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,8 +14,17 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { termData } from '../../src/data/termData';
 
 const STORAGE_KEY    = 'yokomoji_learned_terms';
+const HISTORY_KEY    = 'yokomoji_learned_history';
 const XP_STORAGE_KEY = 'yokomoji_xp';
 const XP_PER_LEVEL   = 100;
+
+type HistoryItem = { id: string; learnedAt: string | null };
+
+function formatDate(iso: string | null): string {
+  if (!iso) return '日付不明';
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+}
 
 function calcLevel(xp: number) {
   const level     = Math.floor(xp / XP_PER_LEVEL) + 1;
@@ -49,6 +60,8 @@ export default function HomeTab() {
   const router = useRouter();
   const [xp, setXp]                   = useState(0);
   const [learnedCount, setLearnedCount] = useState(0);
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [showHistory, setShowHistory]  = useState(false);
 
   const todayKey  = useMemo(() => getTodaysTerm(), []);
   const todayTerm = termData[todayKey];
@@ -59,9 +72,27 @@ export default function HomeTab() {
       AsyncStorage.getItem(XP_STORAGE_KEY).then((val) => {
         setXp(val ? parseInt(val, 10) : 0);
       }).catch(() => setXp(0));
-      AsyncStorage.getItem(STORAGE_KEY).then((json) => {
-        setLearnedCount(json ? (JSON.parse(json) as string[]).length : 0);
-      }).catch(() => setLearnedCount(0));
+      AsyncStorage.getItem(STORAGE_KEY).then(async (json) => {
+        const ids: string[] = json ? JSON.parse(json) : [];
+        setLearnedCount(ids.length);
+        // 履歴（日付マップ）を読み込んでリストを構築
+        try {
+          const hRaw = await AsyncStorage.getItem(HISTORY_KEY);
+          const histMap: Record<string, string> = hRaw ? JSON.parse(hRaw) : {};
+          const items: HistoryItem[] = ids.map((id) => ({
+            id,
+            learnedAt: histMap[id] ?? null,
+          }));
+          // 日付の新しい順、日付不明は末尾
+          items.sort((a, b) => {
+            if (!a.learnedAt && !b.learnedAt) return 0;
+            if (!a.learnedAt) return 1;
+            if (!b.learnedAt) return -1;
+            return b.learnedAt.localeCompare(a.learnedAt);
+          });
+          setHistoryItems(items);
+        } catch { setHistoryItems(ids.map((id) => ({ id, learnedAt: null }))); }
+      }).catch(() => { setLearnedCount(0); setHistoryItems([]); });
     }, [])
   );
 
@@ -146,10 +177,15 @@ export default function HomeTab() {
 
         {/* ── スタッツ ── */}
         <View style={styles.statsRow}>
-          <View style={styles.statCard}>
+          {/* 覚えた用語カード：タップで履歴モーダルを開く */}
+          <TouchableOpacity
+            style={styles.statCard}
+            onPress={() => setShowHistory(true)}
+            activeOpacity={0.7}
+          >
             <Text style={styles.statValue}>{learnedCount}</Text>
-            <Text style={styles.statLabel}>覚えた用語</Text>
-          </View>
+            <Text style={styles.statLabel}>覚えた用語 📋</Text>
+          </TouchableOpacity>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>{level}</Text>
             <Text style={styles.statLabel}>レベル</Text>
@@ -159,6 +195,69 @@ export default function HomeTab() {
             <Text style={styles.statLabel}>総 XP</Text>
           </View>
         </View>
+
+        {/* ── 履歴モーダル ── */}
+        <Modal
+          visible={showHistory}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowHistory(false)}
+        >
+          <TouchableOpacity
+            style={histStyles.backdrop}
+            activeOpacity={1}
+            onPress={() => setShowHistory(false)}
+          >
+            <TouchableOpacity
+              style={histStyles.sheet}
+              activeOpacity={1}
+              onPress={() => {}}
+            >
+              {/* ヘッダー */}
+              <View style={histStyles.header}>
+                <View style={histStyles.headerSpacer} />
+                <View style={histStyles.handle} />
+                <TouchableOpacity
+                  style={histStyles.closeBtn}
+                  onPress={() => setShowHistory(false)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={histStyles.closeBtnText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={histStyles.title}>覚えた用語の記録</Text>
+              <Text style={histStyles.subtitle}>{learnedCount} 語を習得済み</Text>
+
+              {historyItems.length === 0 ? (
+                <View style={histStyles.empty}>
+                  <Text style={histStyles.emptyText}>まだ覚えた用語はありません</Text>
+                  <Text style={histStyles.emptyHint}>発見タブで「🧠 覚えた！」を押すと記録されます</Text>
+                </View>
+              ) : (
+                <FlatList
+                  data={historyItems}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={histStyles.list}
+                  showsVerticalScrollIndicator={false}
+                  renderItem={({ item }) => {
+                    const term = termData[item.id];
+                    return (
+                      <View style={histStyles.row}>
+                        <View style={histStyles.rowLeft}>
+                          <Text style={histStyles.termName}>{item.id}</Text>
+                          {term?.reading && (
+                            <Text style={histStyles.reading}>{term.reading}</Text>
+                          )}
+                        </View>
+                        <Text style={histStyles.date}>{formatDate(item.learnedAt)}</Text>
+                      </View>
+                    );
+                  }}
+                />
+              )}
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </Modal>
 
         {/* ── 使い方ヒント ── */}
         <Text style={styles.hintTitle}>使い方</Text>
@@ -420,4 +519,77 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#333',
   },
+});
+
+// ── 履歴モーダル スタイル ──────────────────────────────────
+const histStyles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '85%',
+    paddingBottom: 40,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 4,
+  },
+  headerSpacer: { width: 32, height: 32 },
+  handle: {
+    width: 38,
+    height: 4,
+    backgroundColor: '#ddd',
+    borderRadius: 2,
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeBtnText: { fontSize: 14, color: '#555', fontWeight: '600' },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#111',
+    paddingHorizontal: 16,
+    marginTop: 4,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: '#888',
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    marginTop: 2,
+  },
+  list: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  rowLeft: { flex: 1 },
+  termName: { fontSize: 15, fontWeight: '600', color: '#222' },
+  reading: { fontSize: 11, color: '#aaa', marginTop: 1 },
+  date: { fontSize: 12, color: '#4A90E2', fontWeight: '600', marginLeft: 12 },
+  empty: { alignItems: 'center', paddingVertical: 48 },
+  emptyText: { fontSize: 15, fontWeight: '600', color: '#777', marginBottom: 8 },
+  emptyHint: { fontSize: 13, color: '#aaa', textAlign: 'center', lineHeight: 20 },
 });
