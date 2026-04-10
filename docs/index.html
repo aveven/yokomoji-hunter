@@ -164,6 +164,7 @@ nav {
 }
 @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
 .detail-box .analogy-label { color: var(--accent2); font-weight: 700; }
+.detail-box .usage-label { color: #7ec8e3; font-weight: 700; }
 .value-box {
   background: linear-gradient(135deg, #1a1a2e, #16213e); border: 1px solid #2a2a5a;
   border-radius: 12px; padding: 14px 16px;
@@ -579,8 +580,12 @@ function showRevealCard(data) {
   // 詳細・例え話ボタン
   const detailBox = document.getElementById('rc-detail');
   const detailBtn = document.getElementById('rc-detail-btn');
-  if (data.detail) {
-    detailBox.innerHTML = data.detail;
+  if (data.detail || data.usage) {
+    let detailHTML = data.detail || '';
+    if (data.usage) {
+      detailHTML += `<br><br><span class='usage-label'>💬 使い方：</span>${data.usage}`;
+    }
+    detailBox.innerHTML = detailHTML;
     detailBox.style.display = 'none';
     detailBtn.style.display = 'inline-block';
     detailBtn.textContent = '▼ もっと詳しく・例え話';
