@@ -58,10 +58,10 @@ export default function HomeTab() {
     useCallback(() => {
       AsyncStorage.getItem(XP_STORAGE_KEY).then((val) => {
         setXp(val ? parseInt(val, 10) : 0);
-      });
+      }).catch(() => setXp(0));
       AsyncStorage.getItem(STORAGE_KEY).then((json) => {
         setLearnedCount(json ? (JSON.parse(json) as string[]).length : 0);
-      });
+      }).catch(() => setLearnedCount(0));
     }, [])
   );
 

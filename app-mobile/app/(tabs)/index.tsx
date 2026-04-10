@@ -106,9 +106,9 @@ export default function DiscoverScreen() {
 
   // 起動時に保存済み用語を読み込む
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then((json) => {
-      if (json) setLearnedIds(JSON.parse(json));
-    });
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then((json) => { if (json) setLearnedIds(JSON.parse(json)); })
+      .catch(() => setLearnedIds([]));
   }, []);
 
   // 覚えた！ボタンを押したとき

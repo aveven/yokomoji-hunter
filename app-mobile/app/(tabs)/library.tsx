@@ -93,7 +93,7 @@ export default function LibraryScreen() {
           .filter((id) => termData[id])
           .map((id) => ({ id, rank: termData[id].rank }));
         setLearnedItems(items);
-      });
+      }).catch(() => setLearnedItems([]));
     }, [])
   );
 

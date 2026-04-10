@@ -111,28 +111,34 @@ export default function QuizScreen() {
         setSelectedId(null);
         setTotalCount(0);
         setCorrectCount(0);
+      }).catch(() => {
+        // ストレージエラー時は空の状態にフォールバック
+        setLearnedIds([]);
+        setCurrentQuestion(null);
       });
       // XP は累積値なので上書きせず読み込みのみ
       AsyncStorage.getItem(XP_STORAGE_KEY).then((val) => {
         setXp(val ? parseInt(val, 10) : 0);
-      });
+      }).catch(() => setXp(0));
     }, [])
   );
 
   // 選択肢タップ
-  const handleSelect = useCallback((choice: Choice) => {
+  const handleSelect = useCallback(async (choice: Choice) => {
     if (selectedId !== null) return; // 回答済みは無視（二重カウント防止）
     setSelectedId(choice.id);
     setTotalCount((n) => n + 1);
     if (choice.isCorrect) {
       setCorrectCount((n) => n + 1);
-      setXp((prev) => {
-        const next = prev + XP_PER_CORRECT;
-        AsyncStorage.setItem(XP_STORAGE_KEY, String(next));
-        return next;
-      });
+      const next = xp + XP_PER_CORRECT;
+      setXp(next);
+      try {
+        await AsyncStorage.setItem(XP_STORAGE_KEY, String(next));
+      } catch {
+        // 書き込み失敗時もXP表示は更新済み（次の読み込みで修正される）
+      }
     }
-  }, [selectedId]);
+  }, [selectedId, xp]);
 
   // 「次の問題へ」ボタン
   const handleNext = useCallback(() => {
