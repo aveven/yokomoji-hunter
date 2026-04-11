@@ -554,7 +554,7 @@ const detailStyles = StyleSheet.create({
     borderLeftColor: '#F5A623',
     borderRadius: 8,
     padding: 12,
-    marginBottom: 8,
+    marginBottom: 14,
   },
   valueLabel: {
     fontSize: 12,
