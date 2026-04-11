@@ -12,6 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { termData, Rank } from '../../src/data/termData';
+import { TermDetailContent } from '../../src/components/TermDetailContent';
+import { modalStyles } from '../../src/components/sharedModalStyles';
 
 const STORAGE_KEY = 'yokomoji_learned_terms';
 
@@ -34,68 +36,6 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'aiueo',    label: 'あいうえお順' },
   { key: 'alphabet', label: 'ABC順' },
 ];
-
-// ─── 詳細モーダルの中身（発見タブと同一構成） ──────────────
-type DetailContentProps = { termId: string };
-
-function DetailContent({ termId }: DetailContentProps) {
-  const term = termData[termId];
-  if (!term) return null;
-
-  return (
-    <View style={detailStyles.inner}>
-      {/* 用語名 */}
-      <Text style={detailStyles.termName}>{termId}</Text>
-
-      {/* 読み方（あれば） */}
-      {term.reading && (
-        <Text style={detailStyles.reading}>読み方：{term.reading}</Text>
-      )}
-
-      {/* ランク */}
-      <View style={detailStyles.rankRow}>
-        <View style={[detailStyles.rankBadge, { backgroundColor: RANK_COLORS[term.rank] }]}>
-          <Text style={detailStyles.rankText}>{term.rank}</Text>
-        </View>
-      </View>
-
-      {/* インパクトバー */}
-      <Text style={detailStyles.label}>実務インパクト</Text>
-      <View style={detailStyles.barBg}>
-        <View style={[detailStyles.barFill, { width: `${term.impact}%` as any }]} />
-      </View>
-      <Text style={detailStyles.impactValue}>{term.impact} / 100</Text>
-
-      {/* 解説 */}
-      <Text style={detailStyles.label}>解説</Text>
-      <Text style={detailStyles.explanation}>{term.description}</Text>
-
-      {/* もっと詳しく・例え話 */}
-      {term.detail && (
-        <View style={detailStyles.detailBox}>
-          <Text style={detailStyles.detailLabel}>📖 もっと詳しく・例え話</Text>
-          <Text style={detailStyles.detailText}>{term.detail}</Text>
-        </View>
-      )}
-
-      {/* 使い方 */}
-      {term.usage && (
-        <View style={detailStyles.usageBox}>
-          <Text style={detailStyles.usageLabel}>💬 使い方</Text>
-          <Text style={detailStyles.usageText}>{term.usage}</Text>
-        </View>
-      )}
-
-      {/* 覚えるとどうなる */}
-      {term.value && (
-        <View style={detailStyles.valueBox}>
-          <Text style={detailStyles.valueLabel}>🚀 覚えるとどうなる</Text>
-          <Text style={detailStyles.valueText}>{term.value}</Text>
-        </View>
-      )}
-    </View>
-  );
-}
 
 // ─── メイン画面 ───────────────────────────────────────────
 export default function LibraryScreen() {
@@ -121,7 +61,6 @@ export default function LibraryScreen() {
     }, [])
   );
 
-  // 選択中のソートキーで並び替え（learnedItems は変更しない）
   const sortedItems = useMemo(() => {
     const items = [...learnedItems];
     switch (sort) {
@@ -142,7 +81,6 @@ export default function LibraryScreen() {
     }
   }, [learnedItems, sort]);
 
-  // モーダルを閉じる
   const handleClose = useCallback(() => setSelectedId(null), []);
 
   return (
@@ -153,7 +91,6 @@ export default function LibraryScreen() {
         <Text style={styles.count}>覚えた用語：{learnedItems.length} 件</Text>
       )}
 
-      {/* 並び替えボタン（用語がある時だけ表示） */}
       {learnedItems.length > 0 && (
         <View style={styles.sortRow}>
           {SORT_OPTIONS.map((opt) => (
@@ -215,26 +152,22 @@ export default function LibraryScreen() {
         }
       />
 
-      {/* ─── 詳細モーダル（発見タブと同一構造） ─── */}
       <Modal
         visible={selectedId !== null}
         transparent
         animationType="fade"
         onRequestClose={handleClose}
       >
-        {/* 背景タップで閉じる */}
         <TouchableOpacity
           style={modalStyles.backdrop}
           activeOpacity={1}
           onPress={handleClose}
         >
-          {/* ボトムシート（シート内タップは閉じない） */}
           <TouchableOpacity
             style={modalStyles.sheet}
             activeOpacity={1}
-            onPress={() => {/* シート内タップは閉じない */}}
+            onPress={() => {}}
           >
-            {/* シートヘッダー：ハンドル ＋ × ボタン */}
             <View style={modalStyles.sheetHeader}>
               <View style={modalStyles.headerSpacer} />
               <View style={modalStyles.handle} />
@@ -246,13 +179,11 @@ export default function LibraryScreen() {
                 <Text style={modalStyles.closeBtnText}>✕</Text>
               </TouchableOpacity>
             </View>
-
-            {/* スクロールコンテンツ */}
             <ScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={modalStyles.scroll}
             >
-              {selectedId && <DetailContent termId={selectedId} />}
+              {selectedId && <TermDetailContent termId={selectedId} />}
             </ScrollView>
           </TouchableOpacity>
         </TouchableOpacity>
@@ -391,180 +322,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
-  },
-});
-
-// ─── スタイル（モーダル） ──────────────────────────────────
-const modalStyles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '85%',
-    paddingBottom: 40,
-  },
-  sheetHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 4,
-  },
-  headerSpacer: {
-    width: 32,
-    height: 32,
-  },
-  handle: {
-    width: 38,
-    height: 4,
-    backgroundColor: '#ddd',
-    borderRadius: 2,
-  },
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closeBtnText: {
-    fontSize: 14,
-    color: '#555',
-    fontWeight: '600',
-  },
-  scroll: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 16,
-  },
-});
-
-// ─── スタイル（詳細コンテンツ） ────────────────────────────
-const detailStyles = StyleSheet.create({
-  inner: {
-    // モーダルシートの中に直接置くので外枠なし
-  },
-  termName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#111',
-    marginBottom: 4,
-  },
-  reading: {
-    fontSize: 15,
-    color: '#555',
-    marginBottom: 14,
-  },
-  rankRow: {
-    marginBottom: 16,
-  },
-  rankBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rankText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#888',
-    marginBottom: 6,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  barBg: {
-    height: 10,
-    backgroundColor: '#eee',
-    borderRadius: 5,
-    overflow: 'hidden',
-    marginBottom: 4,
-  },
-  barFill: {
-    height: 10,
-    backgroundColor: '#4A90E2',
-    borderRadius: 5,
-  },
-  impactValue: {
-    fontSize: 12,
-    color: '#555',
-    marginBottom: 16,
-    textAlign: 'right',
-  },
-  explanation: {
-    fontSize: 14,
-    color: '#333',
-    lineHeight: 22,
-    marginBottom: 12,
-  },
-  detailBox: {
-    backgroundColor: '#f0f4ff',
-    borderLeftWidth: 3,
-    borderLeftColor: '#4A90E2',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-  },
-  detailLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#4A90E2',
-    marginBottom: 6,
-  },
-  detailText: {
-    fontSize: 13,
-    color: '#333',
-    lineHeight: 20,
-  },
-  usageBox: {
-    backgroundColor: '#f0faff',
-    borderLeftWidth: 3,
-    borderLeftColor: '#7ec8e3',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-  },
-  usageLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#0d8fa6',
-    marginBottom: 6,
-  },
-  usageText: {
-    fontSize: 13,
-    color: '#333',
-    lineHeight: 20,
-    fontStyle: 'italic',
-  },
-  valueBox: {
-    backgroundColor: '#fff8e1',
-    borderLeftWidth: 3,
-    borderLeftColor: '#F5A623',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 14,
-  },
-  valueLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#c87800',
-    marginBottom: 6,
-  },
-  valueText: {
-    fontSize: 13,
-    color: '#333',
-    lineHeight: 20,
   },
 });
