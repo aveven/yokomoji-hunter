@@ -74,7 +74,7 @@ function generateQuestion(
   return {
     correctId,
     explanation: t.description,
-    detail: (t.detail || '').replace(/\n/g, ' '),
+    detail: t.detail || '',
     value: t.value || '',
     usage: t.usage || '',
     choices,
@@ -303,27 +303,29 @@ export default function QuizScreen() {
                 : `❌ 不正解　正解は「${currentQuestion.correctId}」`}
             </Text>
 
-            {/* 解説カード */}
-            <View style={styles.explanationCard}>
-              {!!currentQuestion.detail && (
-                <View style={styles.explanationSection}>
-                  <Text style={styles.explanationCardLabel}>💡 詳しく</Text>
-                  <Text style={styles.explanationCardText}>{currentQuestion.detail}</Text>
-                </View>
-              )}
-              {!!currentQuestion.value && (
-                <View style={styles.explanationSection}>
-                  <Text style={styles.explanationCardLabel}>⭐ 覚えるとどうなる？</Text>
-                  <Text style={styles.explanationCardText}>{currentQuestion.value}</Text>
-                </View>
-              )}
-              {!!currentQuestion.usage && (
-                <View style={styles.explanationSection}>
-                  <Text style={styles.explanationCardLabel}>💬 使い方</Text>
-                  <Text style={[styles.explanationCardText, styles.usageText]}>「{currentQuestion.usage}」</Text>
-                </View>
-              )}
-            </View>
+            {/* 解説カード（detail/value/usage が1つ以上あるときだけ表示） */}
+            {(!!currentQuestion.detail || !!currentQuestion.value || !!currentQuestion.usage) && (
+              <View style={styles.explanationCard}>
+                {!!currentQuestion.detail && (
+                  <View style={styles.explanationSection}>
+                    <Text style={styles.explanationCardLabel}>💡 詳しく</Text>
+                    <Text style={styles.explanationCardText}>{currentQuestion.detail}</Text>
+                  </View>
+                )}
+                {!!currentQuestion.value && (
+                  <View style={styles.explanationSection}>
+                    <Text style={styles.explanationCardLabel}>⭐ 覚えるとどうなる？</Text>
+                    <Text style={styles.explanationCardText}>{currentQuestion.value}</Text>
+                  </View>
+                )}
+                {!!currentQuestion.usage && (
+                  <View style={styles.explanationSection}>
+                    <Text style={styles.explanationCardLabel}>💬 使い方</Text>
+                    <Text style={[styles.explanationCardText, styles.usageText]}>「{currentQuestion.usage}」</Text>
+                  </View>
+                )}
+              </View>
+            )}
 
             <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
               <Text style={styles.nextBtnText}>次の問題へ →</Text>
@@ -586,7 +588,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: '#4A90E2',
-    textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   explanationCardText: {
