@@ -169,8 +169,15 @@ nav {
   background: linear-gradient(135deg, #1a1a2e, #16213e); border: 1px solid #2a2a5a;
   border-radius: 12px; padding: 14px 16px;
 }
-.value-box .vt { font-size: 0.72rem; color: #a29bfe; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.value-box .vt { font-size: 0.72rem; color: #a29bfe; letter-spacing: 0.08em; margin-bottom: 6px; }
 .value-box .vm { font-size: 0.88rem; color: #d0d0ff; line-height: 1.6; }
+/* 使い方ボックス */
+.usage-box {
+  background: linear-gradient(135deg, #0e2433, #102a3d); border: 1px solid #24506d;
+  border-radius: 12px; padding: 14px 16px;
+}
+.usage-box .ut { font-size: 0.72rem; color: #7ec8e3; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700; }
+.usage-box .um { font-size: 0.88rem; color: #d7ecf7; line-height: 1.6; font-style: italic; }
 
 .xp-gain {
   text-align: center; padding: 14px; background: var(--surface2); border-radius: 12px;
@@ -373,6 +380,10 @@ nav {
         <div class="detail-box" id="rc-detail"></div>
       </div>
       <div class="reveal-example" id="rc-example"></div>
+      <div class="usage-box" id="rc-usage-box" style="display:none;">
+        <div class="ut">💬 使い方</div>
+        <div class="um" id="rc-usage"></div>
+      </div>
       <div class="value-box">
         <div class="vt">💡 覚えるとどうなる？</div>
         <div class="vm" id="rc-value"></div>
@@ -577,21 +588,25 @@ function showRevealCard(data) {
   document.getElementById('rc-impact-score').textContent = `実務インパクト ${imp}点`;
   // body
   document.getElementById('rc-explanation').textContent = data.explanation || '';
-  // 詳細・例え話ボタン
+  // 詳細・例え話ボタン（detail のみ。usage は独立ボックスに分離）
   const detailBox = document.getElementById('rc-detail');
   const detailBtn = document.getElementById('rc-detail-btn');
-  if (data.detail || data.usage) {
-    let detailHTML = data.detail || '';
-    if (data.usage) {
-      detailHTML += `<br><br><span class='usage-label'>💬 使い方：</span>${data.usage}`;
-    }
-    detailBox.innerHTML = detailHTML;
+  if (data.detail) {
+    detailBox.innerHTML = data.detail;
     detailBox.style.display = 'none';
     detailBtn.style.display = 'inline-block';
     detailBtn.textContent = '▼ もっと詳しく・例え話';
   } else {
     detailBox.style.display = 'none';
     detailBtn.style.display = 'none';
+  }
+  // 使い方（独立ボックス）
+  const usageBox = document.getElementById('rc-usage-box');
+  if (data.usage) {
+    document.getElementById('rc-usage').textContent = `「${data.usage}」`;
+    usageBox.style.display = 'block';
+  } else {
+    usageBox.style.display = 'none';
   }
   document.getElementById('rc-example').textContent = data.example ? `📌 使用例：${data.example}` : '';
   document.getElementById('rc-value').textContent = data.value || 'この用語を理解することで、今後の調べ直しコストを大きく減らせる可能性があります。';

@@ -1,8 +1,8 @@
 # SCRATCHPAD — 横文字ハンター
 
 ## 最終作業セッション
-- **日付**: 2026-04-17
-- **内容**: app-mobile を EAS Hosting で公開 + 覚えた体験をリッチ化
+- **日付**: 2026-04-17（2回目）
+- **内容**: クイズ解説画面リッチ化 + Web版 usage を独立ボックス化（モバイルとUX統一）
 
 ## 現在の状態
 - Phase 1（HTML + OneDrive）: ✅完了
@@ -36,12 +36,17 @@ app-mobile/
     TermDetailContent.tsx ← 祝福Modal + 日時フォーマット + learnedDate prop
 ```
 
+## 本セッションで完了したこと
+- ✅ `quiz.tsx` にクイズ回答後の解説カード追加（💡 詳しく / ⭐ 覚えると / 💬 使い方）
+- ✅ レビュー指摘3件反映（空カード防止・detail改行維持・無効textTransform削除）
+- ✅ Web版 `docs/index.html` に `usage` 独立ボックス追加（モバイルとUX統一）
+- ✅ app-mobile 再デプロイ、Web版は GitHub Pages が自動反映
+
 ## 次回セッションでやること（HANDOFF.md 参照）
 1. **【最優先】`/handoff` に `/ship` 自動連動を組み込む**
    - 編集対象: `~/.claude/skills/handoff/`
-   - 前セッションでユーザー合意済み
-2. Web版（`docs/index.html`）の `usage` 表示確認
-3. （任意）`quiz.tsx` の解説画面に detail/usage/value を追加するか検討
+   - MacBook Pro側は `~/.claude/*` 編集禁止だったため持ち越し中。Mac Studio側なら編集OK
+2. （任意）Web版で `usage` ボックスの見た目を実機確認し、モバイル版との差分を調整
 
 ## メモ
 - EAS project ID: `3947a0ef-aad4-4698-a226-0a0121145a02`
