@@ -16,6 +16,7 @@ import { TermDetailContent } from '../../src/components/TermDetailContent';
 import { modalStyles } from '../../src/components/sharedModalStyles';
 
 const STORAGE_KEY = 'yokomoji_learned_terms';
+const HISTORY_KEY = 'yokomoji_learned_history';
 
 const RANK_COLORS: Record<Rank, string> = {
   S: '#E8335D',
@@ -29,9 +30,10 @@ type LearnedItem = {
   rank: Rank;
 };
 
-type SortKey = 'impact' | 'aiueo' | 'alphabet';
+type SortKey = 'recent' | 'impact' | 'aiueo' | 'alphabet';
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: 'recent',   label: '覚えた順' },
   { key: 'impact',   label: '重要度順' },
   { key: 'aiueo',    label: 'あいうえお順' },
   { key: 'alphabet', label: 'ABC順' },
@@ -41,7 +43,8 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 export default function LibraryScreen() {
   const router = useRouter();
   const [learnedItems, setLearnedItems] = useState<LearnedItem[]>([]);
-  const [sort, setSort]                 = useState<SortKey>('impact');
+  const [learnedDates, setLearnedDates] = useState<Record<string, string>>({});
+  const [sort, setSort]                 = useState<SortKey>('recent');
   const [selectedId, setSelectedId]     = useState<string | null>(null);
 
   // タブにフォーカスが当たるたびに再読込
@@ -58,12 +61,25 @@ export default function LibraryScreen() {
           .map((id) => ({ id, rank: termData[id].rank }));
         setLearnedItems(items);
       }).catch(() => setLearnedItems([]));
+      AsyncStorage.getItem(HISTORY_KEY).then((json) => {
+        setLearnedDates(json ? JSON.parse(json) : {});
+      }).catch(() => setLearnedDates({}));
     }, [])
   );
 
   const sortedItems = useMemo(() => {
     const items = [...learnedItems];
     switch (sort) {
+      case 'recent':
+        // 覚えた日時の新しい順。履歴なしは末尾に。
+        return items.sort((a, b) => {
+          const da = learnedDates[a.id];
+          const db = learnedDates[b.id];
+          if (!da && !db) return 0;
+          if (!da) return 1;
+          if (!db) return -1;
+          return db.localeCompare(da);
+        });
       case 'impact':
         return items.sort(
           (a, b) => (termData[b.id]?.impact ?? 0) - (termData[a.id]?.impact ?? 0)
@@ -79,7 +95,7 @@ export default function LibraryScreen() {
       default:
         return items;
     }
-  }, [learnedItems, sort]);
+  }, [learnedItems, learnedDates, sort]);
 
   const handleClose = useCallback(() => setSelectedId(null), []);
 
@@ -183,7 +199,12 @@ export default function LibraryScreen() {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={modalStyles.scroll}
             >
-              {selectedId && <TermDetailContent termId={selectedId} />}
+              {selectedId && (
+                <TermDetailContent
+                  termId={selectedId}
+                  learnedDate={learnedDates[selectedId] ?? null}
+                />
+              )}
             </ScrollView>
           </TouchableOpacity>
         </TouchableOpacity>
@@ -222,11 +243,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 16,
     marginBottom: 12,
-    gap: 8,
+    gap: 6,
   },
   sortBtn: {
     flex: 1,
     paddingVertical: 7,
+    paddingHorizontal: 2,
     borderRadius: 8,
     borderWidth: 1.5,
     borderColor: '#ddd',
@@ -238,7 +260,7 @@ const styles = StyleSheet.create({
     borderColor: '#4A90E2',
   },
   sortBtnText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: '#888',
   },

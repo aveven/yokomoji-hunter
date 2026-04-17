@@ -51,12 +51,16 @@ export default function DiscoverScreen() {
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [learnedIds, setLearnedIds] = useState<string[]>([]);
+  const [learnedDates, setLearnedDates] = useState<Record<string, string>>({});
 
-  // 起動時に保存済み用語を読み込む
+  // 起動時に保存済み用語と日時履歴を読み込む
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
       .then((json) => { if (json) setLearnedIds(JSON.parse(json)); })
       .catch(() => setLearnedIds([]));
+    AsyncStorage.getItem(HISTORY_KEY)
+      .then((json) => { if (json) setLearnedDates(JSON.parse(json)); })
+      .catch(() => setLearnedDates({}));
   }, []);
 
   // 覚えた！ボタンを押したとき
@@ -65,13 +69,17 @@ export default function DiscoverScreen() {
     const next = [...learnedIds, id];
     setLearnedIds(next);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    // 日付履歴を記録
+    // 日付履歴を記録（stateにも即時反映）
+    const nowIso = new Date().toISOString();
     try {
       const raw = await AsyncStorage.getItem(HISTORY_KEY);
       const history: Record<string, string> = raw ? JSON.parse(raw) : {};
-      history[id] = new Date().toISOString();
+      history[id] = nowIso;
       await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-    } catch { /* 履歴保存失敗は無視 */ }
+      setLearnedDates(history);
+    } catch {
+      setLearnedDates((prev) => ({ ...prev, [id]: nowIso }));
+    }
   }, [learnedIds]);
 
   // モーダルを閉じる（クエリは維持）
@@ -172,6 +180,7 @@ export default function DiscoverScreen() {
       <TextInput
         style={styles.searchInput}
         placeholder="LLM、CVR… AI用語を検索"
+        placeholderTextColor="#bbb"
         value={query}
         onChangeText={handleQueryChange}
         clearButtonMode="while-editing"
@@ -293,7 +302,9 @@ export default function DiscoverScreen() {
                 <TermDetailContent
                   termId={selectedId}
                   learnedIds={learnedIds}
+                  learnedDate={learnedDates[selectedId] ?? null}
                   onLearn={handleLearn}
+                  onClose={handleClose}
                 />
               )}
             </ScrollView>

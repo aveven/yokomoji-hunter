@@ -6,7 +6,10 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build:web": "npx expo export --platform web",
+    "deploy:web": "npm run build:web && npx eas-cli deploy",
+    "deploy:web:prod": "npm run build:web && npx eas-cli deploy --prod"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

@@ -29,10 +29,19 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "bundler": "metro",
+      "output": "static",
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3947a0ef-aad4-4698-a226-0a0121145a02"
+      }
+    },
+    "owner": "aveven"
   }
 }

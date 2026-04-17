@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Modal } from 'react-native';
 import { termData, Rank } from '../data/termData';
 
 const RANK_COLORS: Record<Rank, string> = {
@@ -8,17 +9,49 @@ const RANK_COLORS: Record<Rank, string> = {
   C: '#7ED321',
 };
 
+// ISO文字列 → 「2026年4月17日 15:30 に覚えた」
+function formatLearnedDate(iso: string): string {
+  const d = new Date(iso);
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${hh}:${mm} に覚えた`;
+}
+
 type Props = {
   termId: string;
   learnedIds?: string[];
+  learnedDate?: string | null;
   onLearn?: (id: string) => void;
+  onClose?: () => void;
 };
 
-export function TermDetailContent({ termId, learnedIds, onLearn }: Props) {
+export function TermDetailContent({ termId, learnedIds, learnedDate, onLearn, onClose }: Props) {
   const term = termData[termId];
+  const [celebrating, setCelebrating] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(0.3)).current;
+
   if (!term) return null;
 
-  const isLearned = learnedIds?.includes(termId) ?? false;
+  const isLearned = !!learnedDate || (learnedIds?.includes(termId) ?? false);
+
+  const handleLearnPress = () => {
+    if (isLearned || !onLearn || celebrating) return;
+    onLearn(termId);
+    setCelebrating(true);
+    scaleAnim.setValue(0.3);
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 4,
+      tension: 80,
+      useNativeDriver: true,
+    }).start();
+
+    // 祝福を閉じてから、詳細モーダルを自動で閉じる
+    setTimeout(() => {
+      setCelebrating(false);
+      onClose?.();
+    }, 1500);
+  };
 
   return (
     <View style={styles.inner}>
@@ -58,17 +91,39 @@ export function TermDetailContent({ termId, learnedIds, onLearn }: Props) {
         </View>
       )}
 
-      {onLearn && (
-        <TouchableOpacity
-          style={[styles.learnBtn, isLearned && styles.learnBtnDone]}
-          onPress={() => !isLearned && onLearn(termId)}
-          activeOpacity={isLearned ? 1 : 0.7}
-        >
-          <Text style={[styles.learnBtnText, isLearned && styles.learnBtnTextDone]}>
-            {isLearned ? '✅ 覚えた済み' : '🧠 覚えた！'}
+      {/* ── アクション領域：既習表示 or 覚えたボタン ── */}
+      {isLearned ? (
+        <View style={styles.learnedInfo}>
+          <Text style={styles.learnedInfoText}>
+            ✅ {learnedDate ? formatLearnedDate(learnedDate) : '覚えた済み'}
           </Text>
+        </View>
+      ) : onLearn ? (
+        <TouchableOpacity
+          style={styles.learnBtn}
+          onPress={handleLearnPress}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.learnBtnText}>🧠 覚えた！</Text>
         </TouchableOpacity>
-      )}
+      ) : null}
+
+      {/* ── 祝福オーバーレイ（画面中央に表示） ── */}
+      <Modal
+        visible={celebrating}
+        transparent
+        animationType="fade"
+      >
+        <View style={styles.celebrationBackdrop} pointerEvents="none">
+          <Animated.View
+            style={[styles.celebrationBox, { transform: [{ scale: scaleAnim }] }]}
+          >
+            <Text style={styles.celebrationEmoji}>🎉</Text>
+            <Text style={styles.celebrationText}>覚えました！</Text>
+            <Text style={styles.celebrationSub}>図鑑に追加しました</Text>
+          </Animated.View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -197,15 +252,55 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: 'center',
   },
-  learnBtnDone: {
-    backgroundColor: '#e8f5e9',
-  },
   learnBtnText: {
     color: '#fff',
     fontSize: 15,
     fontWeight: 'bold',
   },
-  learnBtnTextDone: {
+  learnedInfo: {
+    backgroundColor: '#e8f5e9',
+    borderRadius: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  learnedInfoText: {
     color: '#2e7d32',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  celebrationBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  celebrationBox: {
+    backgroundColor: '#fff8e1',
+    borderRadius: 18,
+    paddingVertical: 28,
+    paddingHorizontal: 36,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#F5A623',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  celebrationEmoji: {
+    fontSize: 56,
+    marginBottom: 6,
+  },
+  celebrationText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#E65100',
+    marginBottom: 4,
+  },
+  celebrationSub: {
+    fontSize: 13,
+    color: '#8a5a00',
   },
 });
