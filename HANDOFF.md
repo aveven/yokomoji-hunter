@@ -1,51 +1,70 @@
-# 引き継ぎ指示書（2026-04-17）
+# 引き継ぎ指示書（2026-04-17 / 2回目セッション）
 
 ## 対象プロジェクト
 yokomoji-hunter: ~/Desktop/ClaudeProjects/yokomoji-hunter/
 
-## 前セッションで完了したこと（Mac側でpush済み）
-- `app-mobile/` を EAS Hosting で **https://yokomoji-hunter.expo.app** に公開
-- 虫歯アプリと同じ方式（`expo export` + `eas deploy`）を移植
-- 発見タブのプレースホルダーを薄いグレーに
-- 「覚えた！」押下で画面中央に祝福アニメ表示 → 1.5秒後に詳細モーダル自動クローズ
-- 覚えた日時を AsyncStorage に保存・再表示（「YYYY年M月D日 HH:MM に覚えた」）
-- 図鑑に **「覚えた順」並び替え** を追加（初期表示もこれに変更）
+## 前セッションで完了したこと（本セッション成果・push済み）
 
-## やること（優先順位順）
+### 1. クイズ解説画面のリッチ化（app-mobile）
+- `quiz.tsx`：回答後の結果表示の下に「解説カード」を追加
+- 表示フィールド：
+  - 💡 詳しく（`detail` — HTMLタグなし、改行そのまま表示）
+  - ⭐ 覚えるとどうなる？（`value`）
+  - 💬 使い方（`usage` — 斜体・カギ括弧付き）
+- 3フィールドすべて空のときはカード自体が非表示（空白カード防止）
+- 回答済み連打は既存の `selectedId !== null` で二重カウント防止
+
+### 2. レビュー指摘3件の反映
+- 空カード描画防止（条件付きレンダリング）
+- `detail` の `\n` を除去せず保持（React Native の `<Text>` が改行として表示）
+- 日本語ラベルに無効だった `textTransform: 'uppercase'` を削除
+
+### 3. Web版（docs/index.html）に `usage` 独立ボックス追加
+- これまで `usage` は「▼ もっと詳しく」トグル内に隠れていた
+- モバイル版と同じく専用ボックス（💬 使い方）として常時表示に変更
+- CSS: `.usage-box` を新規追加（`.value-box` と同系統の配色、斜体）
+- `detail-box` 内の `usage-label` 表示ロジックは削除済み
+
+## やること（この順番で）
 
 ### 1. 【最優先】`/handoff` に `/ship` 自動連動を組み込む
-前セッションで方針合意済み。「ハンドオフしたつもりで push 忘れた」事故を防ぐため、`/handoff` 完了の最後で自動的に `/ship`（コミット+プッシュ）を走らせる仕様にする。
+MacBook Pro 側は `~/.claude/*` 編集禁止の制約で未実装。Mac Studio 側なら編集OK。
 
 **編集対象**:
-- `~/.claude/skills/handoff/` 配下のスキル定義ファイル（handoff skill本体）
+- `~/.claude/skills/handoff/SKILL.md` 本体
 
 **仕様**:
-- SCRATCHPAD.md・HANDOFF.md を生成した直後に git add/commit/push を実行
-- push が失敗しても handoff 文書は必ずローカルに残す（失敗理由を表示し手動コミットを促す）
-- 順序: `/handoff` 生成 → `/ship` 実行（handoff文書ごとコミット）
+- SCRATCHPAD.md・HANDOFF.md 生成 → history.json 更新 → ダッシュボード再生成 の後に、既に実装されている「自動コミット＆プッシュ」ブロックがあれば確認して動作を担保
+- 既に手順7として入っているので、**スキル改修というより動作確認**が主目的
 
-**注意**:
-- このセッション（MacBook Pro）では「`~/.claude/*` 編集禁止」の制約がかかっていたため未実装
-- Mac Studio側では制約なしに編集OK
+**確認コマンド**:
+```bash
+cat ~/.claude/skills/handoff/SKILL.md | grep -A10 "自動コミット"
+```
 
-### 2. Web版（`docs/index.html`）の動作確認
-- GitHub Pages: https://aveven.github.io/yokomoji-hunter/
-- `usage` フィールド（💬 使い方）が表示されるか目視確認
-- 表示されていなければ `docs/index.html` の詳細モーダル部分を修正
+### 2. 実機での usage ボックス見た目チェック（任意）
+- Web版: https://aveven.github.io/yokomoji-hunter/
+  - 用語を入力 → 登録モーダル内で「💬 使い方」ボックスが表示されるか目視
+- モバイル版: https://yokomoji-hunter.expo.app
+  - 発見タブで用語を選ぶ → 詳細モーダル内で「💬 使い方」が出るか
+  - クイズタブで正解/不正解時に解説カードに usage が出るか
+- 色味・斜体・括弧の組み合わせが読みにくければ調整
 
-### 3. （任意）クイズ解説画面のリッチ化
-現状 `quiz.tsx` は `description` のみ表示。`detail` / `usage` / `value` も含めるかユーザーに確認してから着手。
+### 3. （任意）クイズ解説カードの UX 微調整
+現状：回答直後にすべて展開される形で 3 フィールド全部表示。
+候補：`detail` だけ長いので折りたたみ方式にするか、`value` をもっと目立たせるか、などユーザーの使用感しだい。
 
 ## 注意事項
-- **`~/.claude/*` は Mac Studio側なら編集可**（MacBook Pro側の制約はそちらには引き継がれない）
-- デプロイ反映コマンドは `cd app-mobile && npm run deploy:web:prod`
-- `app-mobile/eas.json` は追加済み、`app.json` に EAS projectId (`3947a0ef-aad4-4698-a226-0a0121145a02`) 記録済み
+- **`~/.claude/*` は Mac Studio 側なら編集可**（MacBook Pro 側の制約はそちらに引き継がれない）
+- app-mobile のデプロイは `cd app-mobile && npm run deploy:web:prod`
+- Web版（docs/）は push するだけで GitHub Pages が自動反映
+- KB は 300 語全てに `detail`/`value`/`usage` 有り（空カードは現在のデータでは起きない）
 
 ## 完了条件
-- 【1】 `/handoff` 実行時に自動で push まで完了するようになる
-- 【2】 Web版で `usage` が表示されている／もしくは修正が当たっている
+- 【1】 `/handoff` 実行時に自動で push まで完了するようになる（動作確認済み）
+- 【2】 Web版 / モバイル版どちらでも `usage` が独立ボックスで見えている（✅ 本セッションで達成）
 
 ## 参考（司令塔での議論の要点）
-- 動作確認の手軽さを優先し、Expo Go実機テストより **Webデプロイ優先** の判断を下した（虫歯アプリと同様）
-- 祝福UIは初め「ボタン位置にインライン表示」で実装 → 「画面中央」に変更要望 → `Modal` ネストで解決
-- `/handoff` ＋ `/ship` 自動連動のアイデアは、1セッション=1機能原則 × 他PC連携前提の組み合わせから出た良い改善案（ユーザー発案）
+- レビューエージェントの指摘を「必須修正」「要注意」「良い点」に分けて整理し、必須のみ即修正・要注意は据え置き判断（`isCorrect` の型ゆるさ・XP書き込み失敗時の先行UI）とした
+- Web版の `usage` がトグルの裏に隠れているのは、モバイル版と比較して初めて気づいた UX の差分。並べて見ることで「ここは統一するべき」と判断できた
+- HANDOFF の残タスク「usage 表示確認」を「コードを読むだけ」で済ませず、モバイルとの UX 差分まで踏み込んで対応した
