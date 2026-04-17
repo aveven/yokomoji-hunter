@@ -24,6 +24,9 @@ type Choice = {
 type QuizQuestion = {
   correctId: string;
   explanation: string;
+  detail: string;
+  value: string;
+  usage: string;
   choices: Choice[];
 };
 
@@ -67,9 +70,13 @@ function generateQuestion(
     [choices[i], choices[j]] = [choices[j], choices[i]];
   }
 
+  const t = termData[correctId];
   return {
     correctId,
-    explanation: termData[correctId].description,
+    explanation: t.description,
+    detail: (t.detail || '').replace(/\n/g, ' '),
+    value: t.value || '',
+    usage: t.usage || '',
     choices,
   };
 }
@@ -287,7 +294,7 @@ export default function QuizScreen() {
           })}
         </View>
 
-        {/* 結果 & 次へ */}
+        {/* 結果 & 解説 & 次へ */}
         {isAnswered && (
           <View style={styles.resultContainer}>
             <Text style={[styles.resultText, isCorrect ? styles.resultCorrect : styles.resultWrong]}>
@@ -295,6 +302,29 @@ export default function QuizScreen() {
                 ? `✅ 正解！　+${XP_PER_CORRECT} XP`
                 : `❌ 不正解　正解は「${currentQuestion.correctId}」`}
             </Text>
+
+            {/* 解説カード */}
+            <View style={styles.explanationCard}>
+              {!!currentQuestion.detail && (
+                <View style={styles.explanationSection}>
+                  <Text style={styles.explanationCardLabel}>💡 詳しく</Text>
+                  <Text style={styles.explanationCardText}>{currentQuestion.detail}</Text>
+                </View>
+              )}
+              {!!currentQuestion.value && (
+                <View style={styles.explanationSection}>
+                  <Text style={styles.explanationCardLabel}>⭐ 覚えるとどうなる？</Text>
+                  <Text style={styles.explanationCardText}>{currentQuestion.value}</Text>
+                </View>
+              )}
+              {!!currentQuestion.usage && (
+                <View style={styles.explanationSection}>
+                  <Text style={styles.explanationCardLabel}>💬 使い方</Text>
+                  <Text style={[styles.explanationCardText, styles.usageText]}>「{currentQuestion.usage}」</Text>
+                </View>
+              )}
+            </View>
+
             <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
               <Text style={styles.nextBtnText}>次の問題へ →</Text>
             </TouchableOpacity>
@@ -536,5 +566,36 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: 'bold',
+  },
+
+  // 解説カード
+  explanationCard: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    padding: 16,
+    marginBottom: 16,
+    gap: 12,
+  },
+  explanationSection: {
+    gap: 4,
+  },
+  explanationCardLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#4A90E2',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  explanationCardText: {
+    fontSize: 13,
+    color: '#333',
+    lineHeight: 20,
+  },
+  usageText: {
+    color: '#555',
+    fontStyle: 'italic',
   },
 });
