@@ -1,8 +1,8 @@
 # SCRATCHPAD — 横文字ハンター
 
 ## 最終作業セッション
-- **日付**: 2026-04-17（2回目）
-- **内容**: クイズ解説画面リッチ化 + Web版 usage を独立ボックス化（モバイルとUX統一）
+- **日付**: 2026-04-19
+- **内容**: クイズ解説カード UX 改善（表示順変更 + detail 折りたたみ化）+ EASデプロイ
 
 ## 現在の状態
 - Phase 1（HTML + OneDrive）: ✅完了
@@ -12,8 +12,9 @@
 - KB拡張: ✅完了 — 300語、全語に explanation/value/detail/usage
 - 覚えた体験UX: ✅完了 — 祝福アニメ + 自動クローズ + 日時記録/表示
 - 図鑑の並び替え: ✅完了 — 覚えた順 / 重要度順 / あいうえお順 / ABC順
-- **クイズ解説リッチ化: ✅完了**（本セッション）— 💡 詳しく / ⭐ 覚えると / 💬 使い方
-- **Web版 usage 独立ボックス: ✅完了**（本セッション）— モバイルとUX統一
+- **クイズ解説リッチ化: ✅完了** — 💡 詳しく / ⭐ 覚えると / 💬 使い方
+- **Web版 usage 独立ボックス: ✅完了** — モバイルとUX統一
+- **クイズ解説カード UX 改善: ✅完了**（2026-04-19）— value/usage/detail 順 + detail 折りたたみ化
 
 ## 公開URL
 - **モバイルアプリWeb版（Expo）**: https://yokomoji-hunter.expo.app
@@ -28,19 +29,15 @@ Web版（docs/）は push で GitHub Pages が自動反映
 
 ## 本セッションで触ったファイル
 ```
-app-mobile/app/(tabs)/quiz.tsx     ← 解説カード追加・型拡張・レビュー指摘反映
-docs/index.html                    ← usage 独立ボックス追加（.usage-box / rc-usage）
+app-mobile/app/(tabs)/quiz.tsx     ← 解説カード表示順変更・detail 折りたたみ化
 SCRATCHPAD.md                      ← 本ファイル
 HANDOFF.md                         ← 次セッション指示書
 ```
 
 ## 次回セッションでやること（HANDOFF.md 参照）
-1. **【最優先】`/handoff` + `/ship` 自動連動の動作確認**
-   - 編集対象: `~/.claude/skills/handoff/SKILL.md`
-   - MacBook Pro側は `~/.claude/*` 編集禁止だったため持ち越し中
-   - 既に自動コミットブロックは入っているので、動作確認が主目的
-2. （任意）実機で usage ボックス見た目チェック → 調整
-3. （任意）クイズ解説カードの UX 微調整（折りたたみ等）
+1. **【最優先・持ち越し】`/handoff` 自動コミット動作確認**（`~/.claude/*` 編集可能な環境で）
+2. （任意）実機でクイズ解説カード折りたたみ UX 確認
+3. （任意）次フェーズ検討（クイズ履歴・苦手語ピックアップ等）
 
 ## メモ
 - EAS project ID: `3947a0ef-aad4-4698-a226-0a0121145a02`
