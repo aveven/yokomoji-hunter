@@ -102,6 +102,7 @@ export default function QuizScreen() {
   const [totalCount, setTotalCount] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [xp, setXp] = useState(0);
+  const [expandedDetail, setExpandedDetail] = useState(false);
 
   // タブにフォーカスが当たるたびに再読込・問題リセット
   useFocusEffect(
@@ -118,6 +119,7 @@ export default function QuizScreen() {
         setSelectedId(null);
         setTotalCount(0);
         setCorrectCount(0);
+        setExpandedDetail(false);
       }).catch(() => {
         // ストレージエラー時は空の状態にフォールバック
         setLearnedIds([]);
@@ -161,6 +163,7 @@ export default function QuizScreen() {
     setUsedCorrectIds(nextUsed);
     setCurrentQuestion(generateQuestion(learnedIds, nextUsed));
     setSelectedId(null);
+    setExpandedDetail(false);
   }, [currentQuestion, usedCorrectIds, learnedIds]);
 
   // XP から自動計算（state 不要：xp が変わるたびに自動で再計算）
@@ -306,12 +309,6 @@ export default function QuizScreen() {
             {/* 解説カード（detail/value/usage が1つ以上あるときだけ表示） */}
             {(!!currentQuestion.detail || !!currentQuestion.value || !!currentQuestion.usage) && (
               <View style={styles.explanationCard}>
-                {!!currentQuestion.detail && (
-                  <View style={styles.explanationSection}>
-                    <Text style={styles.explanationCardLabel}>💡 詳しく</Text>
-                    <Text style={styles.explanationCardText}>{currentQuestion.detail}</Text>
-                  </View>
-                )}
                 {!!currentQuestion.value && (
                   <View style={styles.explanationSection}>
                     <Text style={styles.explanationCardLabel}>⭐ 覚えるとどうなる？</Text>
@@ -322,6 +319,22 @@ export default function QuizScreen() {
                   <View style={styles.explanationSection}>
                     <Text style={styles.explanationCardLabel}>💬 使い方</Text>
                     <Text style={[styles.explanationCardText, styles.usageText]}>「{currentQuestion.usage}」</Text>
+                  </View>
+                )}
+                {!!currentQuestion.detail && (
+                  <View style={styles.explanationSection}>
+                    <TouchableOpacity
+                      onPress={() => setExpandedDetail((v) => !v)}
+                      activeOpacity={0.7}
+                      style={styles.detailToggle}
+                    >
+                      <Text style={styles.explanationCardLabel}>
+                        💡 詳しく {expandedDetail ? '▲' : '▼'}
+                      </Text>
+                    </TouchableOpacity>
+                    {expandedDetail && (
+                      <Text style={styles.explanationCardText}>{currentQuestion.detail}</Text>
+                    )}
                   </View>
                 )}
               </View>
@@ -598,5 +611,8 @@ const styles = StyleSheet.create({
   usageText: {
     color: '#555',
     fontStyle: 'italic',
+  },
+  detailToggle: {
+    paddingVertical: 2,
   },
 });
