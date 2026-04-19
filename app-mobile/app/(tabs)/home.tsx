@@ -104,13 +104,13 @@ export default function HomeTab() {
 
         {/* ── アプリヘッダー ── */}
         <View style={styles.hero}>
-          <Text style={styles.heroIcon}>🧠</Text>
-          <Text style={styles.appTitle}>AI用語マスターになる！</Text>
+          <Text style={styles.heroIcon}>🎯</Text>
+          <Text style={styles.appTitle}>横文字ハンター</Text>
           <Text style={styles.appTagline}>
-            調べる・覚える・クイズで定着
+            AI・DX用語を「調べる・覚える・クイズで定着」
           </Text>
           <Text style={styles.appBenefit}>
-            知らないAI用語に出会っても、{'\n'}すぐ理解して前に進める
+            会議の横文字に置いていかれない。{'\n'}明日の一言が、昨日より一歩うまくなる。
           </Text>
         </View>
 

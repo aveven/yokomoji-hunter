@@ -9,11 +9,29 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { termData } from '../../src/data/termData';
+import * as Haptics from 'expo-haptics';
+import { termData, Rank } from '../../src/data/termData';
 
 const STORAGE_KEY = 'yokomoji_learned_terms';
 const XP_STORAGE_KEY = 'yokomoji_xp';
 const XP_PER_CORRECT = 10;
+const PRACTICE_POOL_SIZE = 10;
+
+// 練習モード用の出題プール：覚えた用語が 0 のときに使う
+// S ランクを impact 降順で先頭、足りなければ A ランクで補完
+function buildPracticePool(): string[] {
+  const byRank = (target: Rank) =>
+    Object.keys(termData)
+      .filter((id) => termData[id].rank === target)
+      .sort((a, b) => (termData[b].impact ?? 0) - (termData[a].impact ?? 0));
+  const pool = byRank('S').slice(0, PRACTICE_POOL_SIZE);
+  if (pool.length < PRACTICE_POOL_SIZE) {
+    pool.push(...byRank('A').slice(0, PRACTICE_POOL_SIZE - pool.length));
+  }
+  return pool;
+}
+
+const PRACTICE_IDS = buildPracticePool();
 
 // ─── 型定義 ────────────────────────────────────────────────
 type Choice = {
@@ -96,6 +114,7 @@ function calcLevel(xp: number) {
 export default function QuizScreen() {
   const router = useRouter();
   const [learnedIds, setLearnedIds] = useState<string[]>([]);
+  const [isPractice, setIsPractice] = useState<boolean>(false);
   const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [usedCorrectIds, setUsedCorrectIds] = useState<Set<string>>(new Set());
@@ -112,18 +131,22 @@ export default function QuizScreen() {
         const ids: string[] = json
           ? (JSON.parse(json) as string[]).filter((id) => termData[id])
           : [];
+        const practice = ids.length === 0;
+        const pool = practice ? PRACTICE_IDS : ids;
         setLearnedIds(ids);
+        setIsPractice(practice);
         const fresh = new Set<string>();
         setUsedCorrectIds(fresh);
-        setCurrentQuestion(ids.length > 0 ? generateQuestion(ids, fresh) : null);
+        setCurrentQuestion(generateQuestion(pool, fresh));
         setSelectedId(null);
         setTotalCount(0);
         setCorrectCount(0);
         setExpandedDetail(false);
       }).catch(() => {
-        // ストレージエラー時は空の状態にフォールバック
+        // ストレージエラー時は練習プールで最低限の動作を確保
         setLearnedIds([]);
-        setCurrentQuestion(null);
+        setIsPractice(true);
+        setCurrentQuestion(generateQuestion(PRACTICE_IDS, new Set<string>()));
       });
       // XP は累積値なので上書きせず読み込みのみ
       AsyncStorage.getItem(XP_STORAGE_KEY).then((val) => {
@@ -138,6 +161,8 @@ export default function QuizScreen() {
     setSelectedId(choice.id);
     setTotalCount((n) => n + 1);
     if (choice.isCorrect) {
+      // 正解フィードバック（Web では no-op、失敗しても無視）
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setCorrectCount((n) => n + 1);
       const next = xp + XP_PER_CORRECT;
       setXp(next);
@@ -146,6 +171,8 @@ export default function QuizScreen() {
       } catch {
         // 書き込み失敗時もXP表示は更新済み（次の読み込みで修正される）
       }
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
     }
   }, [selectedId, xp]);
 
@@ -153,60 +180,22 @@ export default function QuizScreen() {
   const handleNext = useCallback(() => {
     if (!currentQuestion) return;
 
+    const pool = isPractice ? PRACTICE_IDS : learnedIds;
     const newUsed = new Set(usedCorrectIds);
     newUsed.add(currentQuestion.correctId);
 
     // 全問使い切り → リセット（generateQuestion 内で自動周回するが state も更新）
-    const remaining = learnedIds.filter((id) => !newUsed.has(id));
+    const remaining = pool.filter((id) => !newUsed.has(id));
     const nextUsed = remaining.length > 0 ? newUsed : new Set<string>();
 
     setUsedCorrectIds(nextUsed);
-    setCurrentQuestion(generateQuestion(learnedIds, nextUsed));
+    setCurrentQuestion(generateQuestion(pool, nextUsed));
     setSelectedId(null);
     setExpandedDetail(false);
-  }, [currentQuestion, usedCorrectIds, learnedIds]);
+  }, [currentQuestion, usedCorrectIds, learnedIds, isPractice]);
 
   // XP から自動計算（state 不要：xp が変わるたびに自動で再計算）
   const { level, xpInLevel, xpNeeded, progress } = calcLevel(xp);
-
-  // ─── 空状態 ──────────────────────────────────────────────
-  if (learnedIds.length === 0) {
-    return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.headingRow}>
-          <Text style={styles.heading}>クイズ</Text>
-          <View style={styles.xpBadge}>
-            <Text style={styles.xpBadgeText}>⚡ XP {xp}</Text>
-          </View>
-        </View>
-        <Text style={styles.subtitle}>マスターした用語を4択クイズで記憶に定着させよう</Text>
-        <View style={styles.levelCard}>
-          <View style={styles.levelCardTop}>
-            <Text style={styles.levelText}>Lv. {level}</Text>
-            <Text style={styles.xpNeededText}>次のレベルまであと {xpNeeded} XP</Text>
-          </View>
-          <View style={styles.levelBarBg}>
-            <View style={[styles.levelBarFill, { width: `${Math.round(progress * 100)}%` as any }]} />
-          </View>
-          <Text style={styles.xpInLevelText}>{xpInLevel} / {XP_PER_LEVEL} XP</Text>
-        </View>
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>🎮</Text>
-          <Text style={styles.emptyText}>まだクイズに出せる用語がありません</Text>
-          <Text style={styles.emptyHint}>
-            発見タブでAI用語を調べて{'\n'}「🧠 覚えた！」を押すとここで出題されます
-          </Text>
-          <TouchableOpacity
-            style={styles.emptyBtn}
-            onPress={() => router.push('/(tabs)/')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.emptyBtnText}>🔍 AI用語を探しに行く</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   // 問題ロード中（通常は一瞬）
   if (!currentQuestion) {
@@ -236,7 +225,27 @@ export default function QuizScreen() {
           </View>
         </View>
 
-        <Text style={styles.subtitle}>マスターした用語を4択クイズで記憶に定着させよう</Text>
+        <Text style={styles.subtitle}>
+          {isPractice
+            ? '重要な用語から出題中（練習モード）'
+            : 'マスターした用語を4択クイズで記憶に定着させよう'}
+        </Text>
+
+        {/* 練習モードバナー */}
+        {isPractice && (
+          <TouchableOpacity
+            style={styles.practiceBanner}
+            onPress={() => router.push('/(tabs)/')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.practiceBannerTitle}>📝 練習モード</Text>
+            <Text style={styles.practiceBannerText}>
+              よく使われる用語で腕試し中。{'\n'}
+              発見タブで「🧠 覚えた！」を押すと、その用語が次回からの出題対象になります。
+            </Text>
+            <Text style={styles.practiceBannerCta}>🔍 発見タブで用語を登録 →</Text>
+          </TouchableOpacity>
+        )}
 
         {/* レベルカード */}
         <View style={styles.levelCard}>
@@ -463,14 +472,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // 空状態
+  // 問題ロード中
   emptyContainer: {
     alignItems: 'center',
     marginTop: 80,
-  },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
   },
   emptyText: {
     fontSize: 16,
@@ -478,23 +483,35 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 8,
   },
-  emptyHint: {
-    fontSize: 13,
-    color: '#999',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 24,
-  },
-  emptyBtn: {
-    backgroundColor: '#4A90E2',
+
+  // 練習モードバナー
+  practiceBanner: {
+    marginHorizontal: 16,
+    marginBottom: 10,
+    backgroundColor: '#FFF4E5',
     borderRadius: 12,
-    paddingVertical: 13,
-    paddingHorizontal: 28,
+    padding: 14,
+    borderWidth: 1.5,
+    borderColor: '#F5A623',
   },
-  emptyBtnText: {
-    color: '#fff',
-    fontSize: 14,
+  practiceBannerTitle: {
+    fontSize: 13,
     fontWeight: 'bold',
+    color: '#E65100',
+    marginBottom: 6,
+    letterSpacing: 0.3,
+  },
+  practiceBannerText: {
+    fontSize: 12,
+    color: '#5D4037',
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  practiceBannerCta: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#4A90E2',
+    textAlign: 'right',
   },
 
   // 問題カード
