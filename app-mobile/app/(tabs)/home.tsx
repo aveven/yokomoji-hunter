@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   FlatList,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -106,6 +107,30 @@ export default function HomeTab() {
   );
 
   const { level, xpInLevel, xpNeeded, progress } = calcLevel(xp);
+
+  const handleShare = useCallback(async () => {
+    const streakLabel = streak >= 3 ? `🔥 ${streak}日連続` : `🌱 ${streak}日目`;
+    const message = [
+      '🎯 横文字ハンター で AI・DX用語を攻略中！',
+      '',
+      `📊 現在の成績`,
+      `  Lv. ${level}（⚡${xp} XP）`,
+      `  🧠 ${learnedCount}語 習得済み`,
+      `  ${streakLabel}`,
+      '',
+      '会議の横文字に置いていかれない。',
+      '1語ずつ、着実に。',
+      '',
+      '#横文字ハンター #AI用語 #DX推進',
+      'https://yokomoji-hunter.expo.app',
+    ].join('\n');
+
+    try {
+      await Share.share({ message, title: '横文字ハンター の成績をシェア' });
+    } catch {
+      // ユーザーキャンセルなど
+    }
+  }, [level, xp, learnedCount, streak]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -267,6 +292,15 @@ export default function HomeTab() {
             </TouchableOpacity>
           </TouchableOpacity>
         </Modal>
+
+        {/* ── シェアボタン ── */}
+        <TouchableOpacity
+          style={styles.shareBtn}
+          onPress={handleShare}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.shareBtnText}>📣 成績をシェアする</Text>
+        </TouchableOpacity>
 
         {/* ── 使い方ヒント ── */}
         <Text style={styles.hintTitle}>使い方</Text>
@@ -504,6 +538,23 @@ const styles = StyleSheet.create({
   streakCardActive: {
     borderColor: '#FF9F43',
     backgroundColor: '#FFF8EE',
+  },
+
+  // ── シェアボタン ──
+  shareBtn: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 1.5,
+    borderColor: '#4A90E2',
+  },
+  shareBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#4A90E2',
+    letterSpacing: 0.3,
   },
 
   // ── ヒント ──
