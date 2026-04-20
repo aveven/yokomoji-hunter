@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { termData } from '../../src/data/termData';
+import { updateStreak } from '../../src/utils/streak';
+import { setupDailyNotification } from '../../src/utils/notifications';
 
 const STORAGE_KEY    = 'yokomoji_learned_terms';
 const HISTORY_KEY    = 'yokomoji_learned_history';
@@ -62,9 +64,16 @@ export default function HomeTab() {
   const [learnedCount, setLearnedCount] = useState(0);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory]  = useState(false);
+  const [streak, setStreak]            = useState(0);
 
   const todayKey  = useMemo(() => getTodaysTerm(), []);
   const todayTerm = termData[todayKey];
+
+  // 初回マウント時のみ: ストリーク更新 + 通知セットアップ
+  useEffect(() => {
+    updateStreak().then(setStreak).catch(() => setStreak(1));
+    setupDailyNotification();
+  }, []);
 
   // タブにフォーカスが当たるたびに最新値を読み込む
   useFocusEffect(
@@ -190,9 +199,9 @@ export default function HomeTab() {
             <Text style={styles.statValue}>{level}</Text>
             <Text style={styles.statLabel}>レベル</Text>
           </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{xp}</Text>
-            <Text style={styles.statLabel}>総 XP</Text>
+          <View style={[styles.statCard, streak >= 3 && styles.streakCardActive]}>
+            <Text style={styles.statValue}>{streak > 0 ? `🔥${streak}` : '🌱1'}</Text>
+            <Text style={styles.statLabel}>日連続</Text>
           </View>
         </View>
 
@@ -491,6 +500,10 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 11,
     color: '#999',
+  },
+  streakCardActive: {
+    borderColor: '#FF9F43',
+    backgroundColor: '#FFF8EE',
   },
 
   // ── ヒント ──
