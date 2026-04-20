@@ -13,6 +13,7 @@ import * as Haptics from 'expo-haptics';
 import { termData, Rank } from '../../src/data/termData';
 
 const STORAGE_KEY = 'yokomoji_learned_terms';
+const HISTORY_KEY = 'yokomoji_learned_history';
 const XP_STORAGE_KEY = 'yokomoji_xp';
 const XP_PER_CORRECT = 10;
 const PRACTICE_POOL_SIZE = 10;
@@ -114,6 +115,7 @@ function calcLevel(xp: number) {
 export default function QuizScreen() {
   const router = useRouter();
   const [learnedIds, setLearnedIds] = useState<string[]>([]);
+  const [learnedSet, setLearnedSet] = useState<Set<string>>(new Set());
   const [isPractice, setIsPractice] = useState<boolean>(false);
   const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -122,6 +124,7 @@ export default function QuizScreen() {
   const [correctCount, setCorrectCount] = useState(0);
   const [xp, setXp] = useState(0);
   const [expandedDetail, setExpandedDetail] = useState(false);
+  const [markedLearned, setMarkedLearned] = useState(false);
 
   // タブにフォーカスが当たるたびに再読込・問題リセット
   useFocusEffect(
@@ -134,6 +137,7 @@ export default function QuizScreen() {
         const practice = ids.length === 0;
         const pool = practice ? PRACTICE_IDS : ids;
         setLearnedIds(ids);
+        setLearnedSet(new Set(ids));
         setIsPractice(practice);
         const fresh = new Set<string>();
         setUsedCorrectIds(fresh);
@@ -142,6 +146,7 @@ export default function QuizScreen() {
         setTotalCount(0);
         setCorrectCount(0);
         setExpandedDetail(false);
+        setMarkedLearned(false);
       }).catch(() => {
         // ストレージエラー時は練習プールで最低限の動作を確保
         setLearnedIds([]);
@@ -176,6 +181,27 @@ export default function QuizScreen() {
     }
   }, [selectedId, xp]);
 
+  // クイズ解説カードから「覚えた！」登録
+  const handleMarkLearned = useCallback(async () => {
+    if (!currentQuestion) return;
+    const id = currentQuestion.correctId;
+    if (learnedSet.has(id)) return;
+    const next = [...learnedIds, id];
+    const nextSet = new Set(next);
+    setLearnedIds(next);
+    setLearnedSet(nextSet);
+    setMarkedLearned(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      const nowIso = new Date().toISOString();
+      const raw = await AsyncStorage.getItem(HISTORY_KEY);
+      const history: Record<string, string> = raw ? JSON.parse(raw) : {};
+      history[id] = nowIso;
+      await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } catch {}
+  }, [currentQuestion, learnedIds, learnedSet]);
+
   // 「次の問題へ」ボタン
   const handleNext = useCallback(() => {
     if (!currentQuestion) return;
@@ -192,6 +218,7 @@ export default function QuizScreen() {
     setCurrentQuestion(generateQuestion(pool, nextUsed));
     setSelectedId(null);
     setExpandedDetail(false);
+    setMarkedLearned(false);
   }, [currentQuestion, usedCorrectIds, learnedIds, isPractice]);
 
   // XP から自動計算（state 不要：xp が変わるたびに自動で再計算）
@@ -346,6 +373,18 @@ export default function QuizScreen() {
                     )}
                   </View>
                 )}
+              </View>
+            )}
+
+            {/* 覚えた！ボタン：未登録=ボタン表示、今セッションで登録=バッジ、登録済み=非表示 */}
+            {!learnedSet.has(currentQuestion.correctId) && (
+              <TouchableOpacity style={styles.learnBtn} onPress={handleMarkLearned}>
+                <Text style={styles.learnBtnText}>🧠 覚えた！</Text>
+              </TouchableOpacity>
+            )}
+            {markedLearned && (
+              <View style={styles.learnedBadge}>
+                <Text style={styles.learnedBadgeText}>✅ 図鑑に登録しました</Text>
               </View>
             )}
 
@@ -631,5 +670,35 @@ const styles = StyleSheet.create({
   },
   detailToggle: {
     paddingVertical: 2,
+  },
+
+  // 覚えた！ボタン
+  learnBtn: {
+    backgroundColor: '#E8F5E9',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderWidth: 1.5,
+    borderColor: '#2e7d32',
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  learnBtnText: {
+    color: '#2e7d32',
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  learnedBadge: {
+    backgroundColor: '#F1F8E9',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  learnedBadgeText: {
+    color: '#558B2F',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
